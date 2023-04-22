@@ -11,6 +11,7 @@ import (
 var (
 	openAiApiKey = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
 	path = flag.String("path", ".", "Path to the git repository")
+	signCommitsMessage = flag.String("sign-commits-with-message", "Created by autommit 🦄 at DD/MM/YYYY", "Will add the provided message to the long commit message")
 )
 
 func main() {
@@ -35,7 +36,7 @@ func main() {
 
 	var autommit = utils.NewAutommit(*openAiApiKey)
 
-	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff()))
+	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff(), *signCommitsMessage))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
