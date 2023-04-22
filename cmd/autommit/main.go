@@ -35,16 +35,16 @@ func main() {
 
 	var autommit = utils.NewAutommit(*openAiApiKey)
 
-	err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff()))
+	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff()))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 		return
 	}
 
-	// fmt.Println(prompt)
+	// fmt.Println(answer)
 
-	// utils.ParseStringAsJson(prompt)
+	autommit.ParseStringAsJson(answer)
 
-	// autommit.GitCommit(false)
+	autommit.GitCommit(true)
 }
