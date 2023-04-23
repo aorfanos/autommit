@@ -32,3 +32,4 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           goos: ${{ matrix.os }}
           goarch: ${{ matrix.arch }}
+          build_command: go build -v -o autommit-${{ matrix.os }}-${{ matrix.arch }} ./cmd/autommit/main.go
