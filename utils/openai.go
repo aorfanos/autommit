@@ -50,8 +50,6 @@ func (a *Autommit) CreateCompletionRequest(prompt string) (string, error) {
 			return "exited with error", err
 		}
 
-		// fmt.Printf(response.Choices[0].Delta.Content)
-
 		buildResp = append(buildResp, fmt.Sprintf(response.Choices[0].Delta.Content))
 	}
 }
