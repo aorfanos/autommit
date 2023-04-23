@@ -33,12 +33,13 @@ func main() {
 	utils.CheckGitPresence()
 
 	// add the file to the git repository
-	utils.GitAdd(*path)
+	// utils.GitAdd(*path)
+	utils.GitAdd()
 
 	var autommit = utils.NewAutommit(*openAiApiKey)
 
 	COMPLETIONLOOP:
-	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff(), *signCommitsMessage))
+	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff(true, nil), *signCommitsMessage))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

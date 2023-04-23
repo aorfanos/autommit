@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/manifoldco/promptui"
 )
 
 var (
@@ -11,6 +13,7 @@ var (
 	gitCommitSelectorQChoices = []string{"✅ Yes", "❌ No", "💸 Regenerate"}
 	gitPushSelectorQTitle = "Push to remote?"
 	gitPushSelectorQChoices = []string{"✅ Yes", "❌ No"}
+	gitAddSelectorQTitle = "Select files to add to the commit"
 
     cmd *exec.Cmd
 )
@@ -26,14 +29,52 @@ func CheckGitPresence() bool {
 	return err == nil
 }
 
-func GitAdd(path string) {
-	cmd := exec.Command("git", "add", path)
-	_, err := cmd.Output()
+func GitAdd() {
+	fileList, err := PopulateFileAddSelector()
 	ErrCheck(err)
+
+	index := -1
+	var result string
+
+	for index < 0 {
+		prompt := promptui.SelectWithAdd{
+			Label: gitAddSelectorQTitle,
+			Items: fileList,
+		}
+
+		index, result, err = prompt.Run()
+
+		if (index == -1) {
+			fileList = append(fileList, result)
+		}
+	}
+
+	if err != nil {
+		fmt.Printf("Prompt failed %v\n", err)
+		return
+	}
+
+	cmd := exec.Command("git", "add", result)
+	_, err = cmd.Output()
+	ErrCheck(err)
+
+	addAnother, err := ProceedSelector("Add another file?", []string{"✅ Yes", "❌ No"})
+	ErrCheck(err)
+	if (addAnother == "✅ Yes") {
+		GitAdd()
+	} else {
+		return
+	}
 }
 
-func GitDiff() (string) {
-	cmd := exec.Command("git", "diff", "--staged", "HEAD")
+// if not staged, it will accept a list of strings to be passed to git
+// as arguments
+func GitDiff(staged bool, args []string) (string) { 
+	if (staged) {
+		cmd = exec.Command("git", "diff", "--staged", "HEAD")
+	} else {
+		cmd = exec.Command("git", args...)
+	}
 	diff, err := cmd.Output()
 	ErrCheck(err)
 	return string(diff)
