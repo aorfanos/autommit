@@ -8,7 +8,7 @@ import (
 
 var (
 	gitCommitSelectorQTitle = "Proceed with the commit?"
-	gitCommitSelectorQChoices = []string{"✅ Yes", "❌ No", "♻️ Regenerate"}
+	gitCommitSelectorQChoices = []string{"✅ Yes", "❌ No", "💸 Regenerate"}
 	gitPushSelectorQTitle = "Push to remote?"
 	gitPushSelectorQChoices = []string{"✅ Yes", "❌ No"}
 
