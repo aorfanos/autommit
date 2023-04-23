@@ -42,6 +42,7 @@ func (a *Autommit) CreateCompletionRequest(prompt string) (string, error) {
 		// we then join the text segment chatgpt provides and return it as string
 		if errors.Is(err, io.EOF) {
 			formattedResp = strings.Join(buildResp, "")
+			fmt.Println(formattedResp)
 			return formattedResp, nil
 		}
 
