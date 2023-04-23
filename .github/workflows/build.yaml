@@ -25,7 +25,7 @@ jobs:
       - name: Build
         run: |
           mkdir -p build
-          mv main build/autommit-build-${{ matrix.os }}-${{ matrix.arch }}
+          CGO_ENABLED=0 GOOS=${{ matrix.os}} GOARCH=${{ matrix.arch }} go build build/autommit-build-${{ matrix.os }}-${{ matrix.arch }}
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
