@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 )
@@ -30,4 +31,9 @@ func ProceedSelector(title string, choices []string) (string, error) {
 	}
 	_, result, err := selector.Run()
 	return result, err
+}
+
+func PopulateFileAddSelector() ([]string, error) {
+	diff := GitDiff(false, []string{"--no-pager", "diff", "--name-only", "HEAD"})
+	return strings.Split(diff, "\n"), nil
 }
