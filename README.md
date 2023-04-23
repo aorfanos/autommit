@@ -22,8 +22,8 @@ It uses the OpenAI API and your local `git` cli to generate appropriate commit m
 | Linux        | arm64        | ✅         |
 | MacOS/Darwin | amd64        | ✅         |
 | MacOS/Darwin | arm64        | ✅         |
-| MacOS/Darwin | amd64        | TODO       |
-| MacOS/Darwin | arm64        | TODO       |
+| Docker       | amd64        | TODO       |
+| Docker       | arm64        | TODO       |
 | Windows      | amd64        | ❌         |
 | Windows      | arm64        | ❌         |
 
