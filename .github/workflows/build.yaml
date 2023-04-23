@@ -22,14 +22,6 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      - name: Build and Test
-        uses: wangyoucao577/go-release-action@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          goos: ${{ matrix.os }}
-          goarch: ${{ matrix.arch }}
-          build_command: go build -v ./cmd/autommit/main.go
-
       - name: Build
         run: |
           mkdir -p build
