@@ -2,8 +2,8 @@ name: Build and Deploy
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
   build:
@@ -22,10 +22,6 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
 
-      # - name: Build and Test
-      #   run: |
-      #     go build -v ./cmd/autommit/main.go
-
       - name: Build and Test
         uses: wangyoucao577/go-release-action@v1
         with:
@@ -33,3 +29,16 @@ jobs:
           goos: ${{ matrix.os }}
           goarch: ${{ matrix.arch }}
           build_command: go build -v ./cmd/autommit/main.go
+
+      - name: Build
+        run: |
+          mkdir -p build
+          mv main build/autommit-build-${{ matrix.os }}-${{ matrix.arch }}
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: build/autommit-build-${{ matrix.os }}-${{ matrix.arch }}
+          asset_name: autommit-${{ matrix.os }}-${{ matrix.arch }}
+          tag: ${{ github.ref }}
