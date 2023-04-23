@@ -12,7 +12,7 @@ var (
 	openAiApiKey = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
 	path = flag.String("path", ".", "Path to the git repository")
 	signCommitsMessage = flag.String("sign-commits-with-message", "Created by autommit 🦄", "Will add the provided message to the long commit message")
-	// autopush = flag.Bool("push", false, "Will automatically add, commit and push the commit to the remote repository")
+	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
 
 func main() {
