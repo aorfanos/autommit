@@ -11,6 +11,7 @@ import (
 var (
 	openAiApiKey = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
 	path = flag.String("path", ".", "Path to the git repository")
+	pgpSignedCommit = flag.Bool("pgp-sign", true, "Will sign the commit with the default PGP key")
 	signCommitsMessage = flag.String("sign-commits-with-message", "Created by autommit 🦄", "Will add the provided message to the long commit message")
 	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
@@ -48,7 +49,7 @@ func main() {
 
 	autommit.ParseStringAsJson(answer)
 
-	if (autommit.GitCommit(true)) {
+	if (autommit.GitCommit()) {
 		fmt.Println("Commit successful. Proceeding to push routine.")
 		utils.GitPush()
 	} else {
