@@ -21,7 +21,6 @@ func (a *Autommit) ParseStringAsJson(strSrc string)  {
 	ErrCheck(err)
 	a.CommitInfo.Message = c.Message
 	a.CommitInfo.MessageLong = c.MessageLong
-	// fmt.Printf("Message: %s\n", c.Message)
 }
 
 func ProceedSelector(title string, choices []string) (string, error) {

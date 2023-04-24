@@ -80,7 +80,7 @@ func GitDiff(staged bool, args []string) (string) {
 	return string(diff)
 }
 
-func (a *Autommit) GitCommit(signCommits bool) (regenerate bool) {
+func (a *Autommit) GitCommit() (regenerate bool) {
 	result, err := ProceedSelector(gitCommitSelectorQTitle, gitCommitSelectorQChoices)
 	ErrCheck(err)
 	if (result == gitCommitSelectorQChoices[1]) { // no
@@ -89,7 +89,7 @@ func (a *Autommit) GitCommit(signCommits bool) (regenerate bool) {
 	} else if (result == gitCommitSelectorQChoices[2]) { // regenerate
 		return false
 	} else if (result == gitCommitSelectorQChoices[0]) { // yes
-		if (signCommits) {
+		if (a.PgpSign) {
 			cmd = exec.Command("git", "commit", "-S", "-m", a.CommitInfo.Message, "-m", a.CommitInfo.MessageLong)
 		} else {
 			cmd = exec.Command("git", "commit", "-m", a.CommitInfo.Message, "-m", a.CommitInfo.MessageLong)
