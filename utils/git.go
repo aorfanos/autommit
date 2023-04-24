@@ -128,6 +128,7 @@ func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 	} else if (result == gitCommitSelectorQChoices[0]) { // yes
 		err = a.GitCommit()
 		ErrCheck(err)
+		return true
 	}
 	return
 }
