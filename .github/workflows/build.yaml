@@ -54,12 +54,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build ghcr.io/${{ github.repository }}/autommit:${{ github.ref }} .
+        run: docker build -t ghcr.io/${{ github.repository }}/autommit:${{ github.ref_name }} .
 
       - name: Push Docker image to GitHub Container Registry
-        run: docker push ghcr.io/${{ github.repository }}/autommit:${{ github.ref }}
+        run: docker push ghcr.io/${{ github.repository }}/autommit:${{ github.ref_name }}
 
       - name: Cleanup
         run: |
-          docker image rm ghcr.io/${{ github.repository }}/autommit:${{ github.ref }}
+          docker image rm ghcr.io/${{ github.repository }}/autommit:${{ github.ref_name }}
           docker logout ghcr.io
