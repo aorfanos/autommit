@@ -126,14 +126,8 @@ func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 		result = gitCommitSelectorQChoices[0]
 		goto IF_EVAL_START
 	} else if (result == gitCommitSelectorQChoices[0]) { // yes
-		if (a.PgpSign) {
-			a.GitCommit()
-		} else {
-			cmd = exec.Command("git", "commit", "-m", a.CommitInfo.Message, "-m", a.CommitInfo.MessageLong)
-		}
-		_, err := cmd.Output()
+		err = a.GitCommit()
 		ErrCheck(err)
-		return true
 	}
 	return
 }
