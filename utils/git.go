@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 
+	git "github.com/go-git/go-git/v5"
 	"github.com/manifoldco/promptui"
 )
 
@@ -18,6 +19,13 @@ var (
     cmd *exec.Cmd
 )
 
+type GitConfig struct {
+	RepoPath string
+	Repo *git.Repository
+	Worktree *git.Worktree
+}
+
+
 type Commit struct {
 	Message string `json:"commit_message"`
 	MessageLong string `json:"commit_message_long"`
@@ -29,9 +37,8 @@ func CheckGitPresence() bool {
 	return err == nil
 }
 
-func GitAdd() {
-	getFilesCmd := GitDiff(false, []string{"--no-pager", "diff", "--name-only", "HEAD"})
-	fileList, err := PopulateFileAddSelector(getFilesCmd)
+func (a *Autommit) GitAddDialogue() {
+	fileList, err := a.PopulateFileList()
 	ErrCheck(err)
 
 	index := -1
@@ -55,14 +62,13 @@ func GitAdd() {
 		return
 	}
 
-	cmd := exec.Command("git", "add", result)
-	_, err = cmd.Output()
+	_, err = a.GitConfig.Worktree.Add(result)
 	ErrCheck(err)
 
 	addAnother, err := ProceedSelector("Add another file?", []string{"✅ Yes", "❌ No"})
 	ErrCheck(err)
 	if (addAnother == "✅ Yes") {
-		GitAdd()
+		a.GitAddDialogue()
 	} else {
 		return
 	}
@@ -126,4 +132,25 @@ func GitPush() error {
 		return err
 	}
 	return nil
+}
+
+// PopulateFileList populates the file list for the add prompt selector
+func (a *Autommit) PopulateFileList() ([]string, error) {
+	var fileList []string
+
+	// get files
+	files, err := a.GitConfig.Worktree.Status()
+	ErrCheck(err)
+
+	// populate file list
+	for fileName, fileStatus := range files {
+		// skip files that are staged
+		if (fileStatus.Staging == git.Modified || 
+			fileStatus.Staging == git.Added) {
+			continue
+		} else {
+			fileList = append(fileList, fileName)
+		}
+	}
+	return fileList, err
 }

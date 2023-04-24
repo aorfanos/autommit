@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	git "github.com/go-git/go-git/v5"
 	openai "github.com/sashabaranov/go-openai"
 )
 
@@ -14,17 +15,27 @@ type Autommit struct {
 	PgpSign bool
 	CommitInfo Commit
 	Type string
+	GitConfig GitConfig
 }
 
-func NewAutommit(openAiApiKey, commitType string) (*Autommit) {
+func NewAutommit(openAiApiKey, commitType, path string) (*Autommit, error) {
 	ctx := context.Background()
 	client := openai.NewClient(openAiApiKey)
+	repo, err := git.PlainOpen(path)
+	ErrCheck(err)
+	workTree, err := repo.Worktree()
+	ErrCheck(err)
 	return &Autommit{
 		OpenAiApiKey: openAiApiKey,
 		Context: ctx,
 		OpenAiClient: *client,
 		Type: commitType,
-	}
+		GitConfig: GitConfig{
+			RepoPath: path,
+			Repo: repo,
+			Worktree: workTree,
+		},
+	}, nil
 }
 
 
