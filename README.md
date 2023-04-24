@@ -22,7 +22,7 @@ It uses the OpenAI API and your local `git` cli to generate appropriate commit m
 | Linux        | arm64        | ✅         |
 | MacOS/Darwin | amd64        | ✅         |
 | MacOS/Darwin | arm64        | ✅         |
-| Docker       | amd64        | TODO       |
+| Docker       | amd64        | ✅         |
 | Docker       | arm64        | TODO       |
 | Windows      | amd64        | ❌         |
 | Windows      | arm64        | ❌         |
@@ -45,7 +45,7 @@ sudo mv autommit /usr/local/bin
 2. Use the Docker image
 
 ```shell
-docker run -v $(pwd):/app ghcr.io/aorfanos/autommit:latest
+docker run -it -e OPENAI_API_KEY=$OPENAI_API_KEY -e GIT_ACC_MAIL="<user-github-mail>" -e GIT_ACC_NAME="<account-fullname)" -v $(pwd):/app:rw autommit
 ```
 
 3. Build from source
