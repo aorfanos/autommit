@@ -6,7 +6,7 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
-  build:
+  build-binaries:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -36,3 +36,27 @@ jobs:
           file: build/autommit-build-${{ matrix.os }}-${{ matrix.arch }}
           asset_name: autommit-${{ matrix.os }}-${{ matrix.arch }}
           tag: ${{ github.ref }}
+
+  build-docker:
+    runs_on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t ghcr.io/${{ github.repository }}/autommit:${{ github.ref }} .
+
+      - name: Push Docker image to GitHub Container Registry
+        run: docker push ghcr.io/${{ github.repository }}/autommit:${{ github.ref }}
+
+      - name: Cleanup
+        run: |
+          docker image rm ghcr.io/${{ github.repository }}/autommit:${{ github.ref }}
+          docker logout ghcr.io
