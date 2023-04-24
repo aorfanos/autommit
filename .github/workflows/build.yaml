@@ -54,7 +54,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}/autommit:${{ github.ref_name }} .
+        run: docker build -e GIT_ACC_MAIL=$GIT_ACC_MAIL -e GIT_ACC_NAME=$GIT_ACC_NAME -t ghcr.io/${{ github.repository }}/autommit:${{ github.ref_name }} .
         env:
           GIT_ACC_MAIL: foo
           GIT_ACC_NAME: bar
