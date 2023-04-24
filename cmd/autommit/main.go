@@ -14,6 +14,8 @@ var (
 	pgpSignedCommit = flag.Bool("pgp-sign", true, "Will sign the commit with the default PGP key")
 	signCommitsMessage = flag.String("sign-commits-with-message", "Created by autommit 🦄", "Will add the provided message to the long commit message")
 	convCommitsType = flag.String("conventional-commits-type", "feat", "Will add the provided type to the commit message")
+	gitUser = flag.String("git-user", "", "Will set the git user")
+	gitEmail = flag.String("git-mail", "", "Will set the git email")
 	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
 
@@ -38,7 +40,13 @@ func main() {
 	// check if git is present in the system
 	utils.CheckGitPresence()
 
-	autommit, err := utils.NewAutommit(*openAiApiKey, *convCommitsType, *path)
+	autommit, err := utils.NewAutommit(
+		*openAiApiKey,
+		*convCommitsType,
+		*path,
+		*gitUser,
+		*gitEmail,
+	)
 	utils.ErrCheck(err)
 
 	// add files to the commit
