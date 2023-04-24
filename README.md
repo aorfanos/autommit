@@ -12,6 +12,26 @@ It uses the OpenAI API and your local `git` cli to generate appropriate commit m
 - OpenAI API key
 - `git` executable in your $PATH
 
+## Usage
+
+```shell
+
+❯ autommit --help
+Usage of autommit:
+  -conventional-commits-type string
+        Will add the provided type to the commit message (default "feat")
+  -openai-api-key string
+        OpenAI API key
+  -path string
+        Path to the git repository (default ".")
+  -pgp-sign
+        Will sign the commit with the default PGP key (default true)
+  -sign-commits-with-message string
+        Will add the provided message to the long commit message (default "Created by autommit 🦄")
+  -t string
+        Alias of --conventional-commits-type
+```
+
 ## Installation
 
 ### Available builds

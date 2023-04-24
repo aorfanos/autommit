@@ -18,7 +18,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(convCommitsType, "t", "feat", "Will add the provided type to the commit message")
+	flag.StringVar(convCommitsType, "t", "feat", "Alias of --conventional-commits-type")
 }
 
 func main() {
