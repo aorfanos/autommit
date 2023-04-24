@@ -15,12 +15,17 @@ func ErrCheck(err error) {
 	}
 }
 
-func (a *Autommit) ParseStringAsJson(strSrc string)  {
+func (a *Autommit) ParseStringAsJson(strSrc string) (error) {
 	var c Commit
 	err := json.Unmarshal([]byte(strSrc), &c)
-	ErrCheck(err)
+	if err != nil {
+		return err
+	} else if (c.Message == "" || c.MessageLong == "") {
+		return fmt.Errorf("Invalid JSON")
+	}
 	a.CommitInfo.Message = c.Message
 	a.CommitInfo.MessageLong = c.MessageLong
+	return nil
 }
 
 func ProceedSelector(title string, choices []string) (string, error) {
@@ -42,7 +47,15 @@ func ProceedEditor(title, target string) (string, error) {
 	return result, err
 }
 
-func PopulateFileAddSelector() ([]string, error) {
-	diff := GitDiff(false, []string{"--no-pager", "diff", "--name-only", "HEAD"})
-	return strings.Split(diff, "\n"), nil
+func PopulateFileAddSelector(gitDiffChangesString string) ([]string, error) {
+	if (gitDiffChangesString == "") {
+		return []string{}, fmt.Errorf("No files to add")
+	}
+	// Split the string by newlines, trim the trailing newline and trim the spaces
+	splitted := strings.Split(strings.TrimSuffix(gitDiffChangesString, "\n"), "\n")
+	for i, v := range splitted {
+		splitted[i] = strings.TrimSpace(v)
+		splitted[i] = strings.TrimSuffix(splitted[i], "\n")
+	}
+	return splitted, nil
 }

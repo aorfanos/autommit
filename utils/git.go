@@ -30,7 +30,8 @@ func CheckGitPresence() bool {
 }
 
 func GitAdd() {
-	fileList, err := PopulateFileAddSelector()
+	getFilesCmd := GitDiff(false, []string{"--no-pager", "diff", "--name-only", "HEAD"})
+	fileList, err := PopulateFileAddSelector(getFilesCmd)
 	ErrCheck(err)
 
 	index := -1

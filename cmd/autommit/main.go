@@ -47,7 +47,8 @@ func main() {
 		return
 	}
 
-	autommit.ParseStringAsJson(answer)
+	err = autommit.ParseStringAsJson(answer)
+	utils.ErrCheck(err)
 
 	if (autommit.GitCommit()) {
 		fmt.Println("Commit successful. Proceeding to push routine.")
