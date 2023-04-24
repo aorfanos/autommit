@@ -137,7 +137,7 @@ func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 
 func (a *Autommit) GitCommit() (error) {
 	commit, err := a.GitConfig.Worktree.Commit(
-		fmt.Sprintf("%s\n\n%s", a.CommitInfo.Message, a.CommitInfo.MessageLong), 
+		fmt.Sprintf("%s\n\n%s", a.CommitInfo.Message, a.CommitInfo.MessageLong),
 		&git.CommitOptions{
 			Author: &object.Signature{
 				Name: a.GitConfig.Author,
@@ -177,7 +177,7 @@ func (a *Autommit) PopulateFileList() ([]string, error) {
 	// populate file list
 	for fileName, fileStatus := range files {
 		// skip files that are staged
-		if (fileStatus.Staging == git.Modified || 
+		if (fileStatus.Staging == git.Modified ||
 			fileStatus.Staging == git.Added) {
 			continue
 		} else {
@@ -195,7 +195,7 @@ func (a *Autommit) CheckForStagedFiles() (exist bool, fileNames []string) {
 	ErrCheck(err)
 
 	for fileName, fileStatus := range files {
-		if (fileStatus.Staging == git.Modified || 
+		if (fileStatus.Staging == git.Modified ||
 			fileStatus.Staging == git.Added) {
 			fileNames = append(fileNames, fileName)
 			return true, fileNames

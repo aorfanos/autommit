@@ -9,7 +9,7 @@ RUN go build -a -installsuffix cgo -ldflags "-w -s" -o autommit cmd/autommit/mai
 
 FROM debian:sid-slim
 WORKDIR /app
-RUN apt-get update && apt-get install -y git 
+RUN apt-get update && apt-get install -y git
 
 RUN git config --global user.email "${GIT_ACC_MAIL}" && \
     git config --global user.name "${GIT_ACC_NAME}"
