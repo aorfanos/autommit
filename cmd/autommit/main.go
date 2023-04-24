@@ -65,7 +65,7 @@ func main() {
 
 	if (autommit.GitCommitDialogue()) {
 		fmt.Println("Commit successful. Proceeding to push routine.")
-		utils.GitPush()
+		autommit.GitPush()
 	} else {
 		fmt.Println("Will recreate a message")
 		goto COMPLETIONLOOP

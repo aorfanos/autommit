@@ -151,16 +151,16 @@ func (a *Autommit) GitCommit() (error) {
 	return err
 }
 
-func GitPush() error {
+func (a *Autommit) GitPush() error {
 	result, err := ProceedSelector(gitPushSelectorQTitle, gitPushSelectorQChoices)
 	ErrCheck(err)
 
 	if (result == gitPushSelectorQChoices[1]) { // no
 		fmt.Println("Push aborted")
+		a.UnstageFiles()
 		return nil
 	} else if (result == gitPushSelectorQChoices[0]) { // yes
-		cmd := exec.Command("git", "push")
-		_, err := cmd.Output()
+		err = a.GitConfig.Repo.Push(&git.PushOptions{})
 		return err
 	}
 	return nil
