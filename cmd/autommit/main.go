@@ -13,8 +13,13 @@ var (
 	path = flag.String("path", ".", "Path to the git repository")
 	pgpSignedCommit = flag.Bool("pgp-sign", true, "Will sign the commit with the default PGP key")
 	signCommitsMessage = flag.String("sign-commits-with-message", "Created by autommit 🦄", "Will add the provided message to the long commit message")
+	convCommitsType = flag.String("conventional-commits-type", "feat", "Will add the provided type to the commit message")
 	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
+
+func init() {
+	flag.StringVar(convCommitsType, "t", "feat", "Will add the provided type to the commit message")
+}
 
 func main() {
 	flag.Parse()
@@ -37,7 +42,7 @@ func main() {
 	// utils.GitAdd(*path)
 	utils.GitAdd()
 
-	var autommit = utils.NewAutommit(*openAiApiKey)
+	var autommit = utils.NewAutommit(*openAiApiKey, *convCommitsType)
 
 	COMPLETIONLOOP:
 	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff(true, nil), *signCommitsMessage))
