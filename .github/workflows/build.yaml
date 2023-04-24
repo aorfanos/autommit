@@ -7,6 +7,7 @@ on:
 
 jobs:
   build-binaries:
+    name: Build binaries
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -38,6 +39,7 @@ jobs:
           tag: ${{ github.ref }}
 
   build-docker:
+    name: Build docker image
     runs_on: ubuntu-latest
     steps:
       - name: Checkout code
