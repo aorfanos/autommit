@@ -55,6 +55,9 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t ghcr.io/${{ github.repository }}/autommit:${{ github.ref_name }} .
+        env:
+          GIT_ACC_MAIL: foo
+          GIT_ACC_NAME: bar
 
       - name: Push Docker image to GitHub Container Registry
         run: docker push ghcr.io/${{ github.repository }}/autommit:${{ github.ref_name }}
