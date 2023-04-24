@@ -38,11 +38,11 @@ func main() {
 	// check if git is present in the system
 	utils.CheckGitPresence()
 
-	// add the file to the git repository
-	// utils.GitAdd(*path)
-	utils.GitAdd()
+	autommit, err := utils.NewAutommit(*openAiApiKey, *convCommitsType, *path)
+	utils.ErrCheck(err)
 
-	var autommit = utils.NewAutommit(*openAiApiKey, *convCommitsType)
+	// add files to the commit
+	autommit.GitAddDialogue()
 
 	COMPLETIONLOOP:
 	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff(true, nil), *signCommitsMessage))

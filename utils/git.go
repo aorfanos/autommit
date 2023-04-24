@@ -41,6 +41,11 @@ func (a *Autommit) GitAddDialogue() {
 	fileList, err := a.PopulateFileList()
 	ErrCheck(err)
 
+	if (len(fileList) == 0) {
+		fmt.Println("No new files to stage, proceeding to commit dialogue")
+		return
+	}
+
 	index := -1
 	var result string
 
