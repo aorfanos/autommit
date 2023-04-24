@@ -51,7 +51,7 @@ func (a *Autommit) GitAddDialogue() {
 
 	if (len(fileList) == 0) {
 		if (!stagedFilesExist) {
-			fmt.Println("No files already staged, exiting")
+			fmt.Println("No files to stage, or already staged - exiting")
 			os.Exit(0)
 		} else {
 			fmt.Println("No new files to stage, proceeding to commit dialogue")
