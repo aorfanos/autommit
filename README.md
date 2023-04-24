@@ -32,6 +32,10 @@ Usage of autommit:
         Alias of --conventional-commits-type
 ```
 
+### Demo 
+
+- Asciinema [rec](https://goo.com)
+
 ## Installation
 
 ### Available builds
