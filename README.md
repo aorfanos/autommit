@@ -65,7 +65,7 @@ sudo mv autommit /usr/local/bin
 2. Use the Docker image
 
 ```shell
-docker run -it -e OPENAI_API_KEY=$OPENAI_API_KEY -e GIT_ACC_MAIL="<user-github-mail>" -e GIT_ACC_NAME="<account-fullname)" -v $(pwd):/app:rw autommit
+docker run -it -e OPENAI_API_KEY=$OPENAI_API_KEY -e GIT_ACC_MAIL="$(git config user.email)" -e GIT_ACC_NAME="$(git config user.name)" -v $(pwd):/app:rw ghcr.io/aorfanos/autommit:latest
 ```
 
 3. Build from source
