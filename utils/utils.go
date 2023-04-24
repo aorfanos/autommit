@@ -32,6 +32,16 @@ func ProceedSelector(title string, choices []string) (string, error) {
 	return result, err
 }
 
+func ProceedEditor(title, target string) (string, error) {
+	prompt := promptui.Prompt{
+		Label: title,
+		Default: target,
+	}
+	result, err := prompt.Run()
+	ErrCheck(err)
+	return result, err
+}
+
 func PopulateFileAddSelector() ([]string, error) {
 	diff := GitDiff(false, []string{"--no-pager", "diff", "--name-only", "HEAD"})
 	return strings.Split(diff, "\n"), nil

@@ -10,7 +10,7 @@ import (
 
 var (
 	gitCommitSelectorQTitle = "Proceed with the commit?"
-	gitCommitSelectorQChoices = []string{"✅ Yes", "❌ No", "💸 Regenerate"}
+	gitCommitSelectorQChoices = []string{"✅ Yes", "❌ No", "💸 Regenerate", "🔍 Edit"}
 	gitPushSelectorQTitle = "Push to remote?"
 	gitPushSelectorQChoices = []string{"✅ Yes", "❌ No"}
 	gitAddSelectorQTitle = "Select files to add to the commit"
@@ -83,11 +83,22 @@ func GitDiff(staged bool, args []string) (string) {
 func (a *Autommit) GitCommit() (regenerate bool) {
 	result, err := ProceedSelector(gitCommitSelectorQTitle, gitCommitSelectorQChoices)
 	ErrCheck(err)
+	IF_EVAL_START:
 	if (result == gitCommitSelectorQChoices[1]) { // no
 		fmt.Println("Commit aborted")
 		os.Exit(0)
 	} else if (result == gitCommitSelectorQChoices[2]) { // regenerate
 		return false
+	} else if (result == gitCommitSelectorQChoices[3]) { // edit
+		a.CommitInfo.Message, err = ProceedEditor("Change commit message", a.CommitInfo.Message)
+		ErrCheck(err)
+		a.CommitInfo.MessageLong, err = ProceedEditor("Change commit message long", a.CommitInfo.MessageLong)
+		ErrCheck(err)
+		// set result to yes after editing and goto start of if
+		// so that logic proceeds as if the user selected yes
+		// since we assume intent to commit after editing
+		result = gitCommitSelectorQChoices[0]
+		goto IF_EVAL_START
 	} else if (result == gitCommitSelectorQChoices[0]) { // yes
 		if (a.PgpSign) {
 			cmd = exec.Command("git", "commit", "-S", "-m", a.CommitInfo.Message, "-m", a.CommitInfo.MessageLong)
