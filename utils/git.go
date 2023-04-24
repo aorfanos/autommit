@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/manifoldco/promptui"
 )
 
@@ -25,6 +28,7 @@ type GitConfig struct {
 	RepoPath string
 	Repo *git.Repository
 	Worktree *git.Worktree
+	HeadRef *plumbing.Reference
 }
 
 
@@ -137,11 +141,11 @@ func (a *Autommit) GitCommit() (error) {
 	commit, err := a.GitConfig.Worktree.Commit(
 		fmt.Sprintf("%s\n\n%s", a.CommitInfo.Message, a.CommitInfo.MessageLong),
 		&git.CommitOptions{
-			// Author: &object.Signature{
-			// 	Name: a.GitConfig.Author,
-			// 	Email: a.GitConfig.AuthorMail,
-			// 	When: time.Now(),
-			// },
+			Author: &object.Signature{
+				Name: fmt.Sprintf("%s", a.GitConfig.Author),
+				Email: fmt.Sprintf("%s", a.GitConfig.AuthorMail),
+				When: time.Now(),
+			},
 		})
 	ErrCheck(err)
 	_, err = a.GitConfig.Repo.CommitObject(commit)

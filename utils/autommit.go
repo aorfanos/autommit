@@ -25,6 +25,8 @@ func NewAutommit(openAiApiKey, commitType, path, gitUser, gitEmail string) (*Aut
 	ErrCheck(err)
 	workTree, err := repo.Worktree()
 	ErrCheck(err)
+	headRef, err := repo.Head()
+	ErrCheck(err)
 	return &Autommit{
 		OpenAiApiKey: openAiApiKey,
 		Context: ctx,
@@ -36,6 +38,7 @@ func NewAutommit(openAiApiKey, commitType, path, gitUser, gitEmail string) (*Aut
 			RepoPath: path,
 			Repo: repo,
 			Worktree: workTree,
+			HeadRef: headRef,
 		},
 	}, nil
 }
