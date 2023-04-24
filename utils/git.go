@@ -29,6 +29,7 @@ type GitConfig struct {
 type Commit struct {
 	Message string `json:"commit_message"`
 	MessageLong string `json:"commit_message_long"`
+	FilesAffected []string `json:"files_affected"`
 }
 
 func CheckGitPresence() bool {
@@ -37,12 +38,22 @@ func CheckGitPresence() bool {
 	return err == nil
 }
 
+// func GitAddDialogue will ask the user to select files to add to the commit
+// if no files are available to select and no files are already staged, it will exit the program
+// if no files are available to select but some files are already staged, it will proceed to the commit dialogue
 func (a *Autommit) GitAddDialogue() {
 	fileList, err := a.PopulateFileList()
 	ErrCheck(err)
 
+	stagedFilesExist, _ := a.CheckForStagedFiles()
+
 	if (len(fileList) == 0) {
-		fmt.Println("No new files to stage, proceeding to commit dialogue")
+		if (!stagedFilesExist) {
+			fmt.Println("No files already staged, exiting")
+			os.Exit(0)
+		} else {
+			fmt.Println("No new files to stage, proceeding to commit dialogue")
+		}
 		return
 	}
 
@@ -92,12 +103,13 @@ func GitDiff(staged bool, args []string) (string) {
 	return string(diff)
 }
 
-func (a *Autommit) GitCommit() (regenerate bool) {
+func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 	result, err := ProceedSelector(gitCommitSelectorQTitle, gitCommitSelectorQChoices)
 	ErrCheck(err)
 	IF_EVAL_START:
 	if (result == gitCommitSelectorQChoices[1]) { // no
-		fmt.Println("Commit aborted")
+		// unstage all files
+		a.UnstageFiles()
 		os.Exit(0)
 	} else if (result == gitCommitSelectorQChoices[2]) { // regenerate
 		return false
@@ -155,7 +167,33 @@ func (a *Autommit) PopulateFileList() ([]string, error) {
 			continue
 		} else {
 			fileList = append(fileList, fileName)
+			a.CommitInfo.FilesAffected = append(a.CommitInfo.FilesAffected, fileName)
 		}
 	}
 	return fileList, err
+}
+
+// CheckForStagedFiles checks if there are any staged files
+// if there are, it will return true, and list them
+func (a *Autommit) CheckForStagedFiles() (exist bool, fileNames []string) {
+	files, err := a.GitConfig.Worktree.Status()
+	ErrCheck(err)
+
+	for fileName, fileStatus := range files {
+		if (fileStatus.Staging == git.Modified || 
+			fileStatus.Staging == git.Added) {
+			fileNames = append(fileNames, fileName)
+			return true, fileNames
+		}
+	}
+	return false, nil
+}
+
+// UnstageFiles unstages all files
+func (a *Autommit) UnstageFiles() (error) {
+	err := a.GitConfig.Worktree.Reset(&git.ResetOptions{
+		Mode: git.MixedReset,
+	})
+	ErrCheck(err)
+	return err
 }
