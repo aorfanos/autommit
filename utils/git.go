@@ -20,6 +20,8 @@ var (
 )
 
 type GitConfig struct {
+	Author string
+	AuthorMail string
 	RepoPath string
 	Repo *git.Repository
 	Worktree *git.Worktree
@@ -125,7 +127,7 @@ func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 		goto IF_EVAL_START
 	} else if (result == gitCommitSelectorQChoices[0]) { // yes
 		if (a.PgpSign) {
-			cmd = exec.Command("git", "commit", "-S", "-m", a.CommitInfo.Message, "-m", a.CommitInfo.MessageLong)
+			a.GitCommit()
 		} else {
 			cmd = exec.Command("git", "commit", "-m", a.CommitInfo.Message, "-m", a.CommitInfo.MessageLong)
 		}
@@ -134,6 +136,16 @@ func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 		return true
 	}
 	return
+}
+
+func (a *Autommit) GitCommit() (error) {
+	commit, err := a.GitConfig.Worktree.Commit(
+		fmt.Sprintf("%s\n\n%s", a.CommitInfo.Message, a.CommitInfo.MessageLong), 
+		&git.CommitOptions{})
+	ErrCheck(err)
+	_, err = a.GitConfig.Repo.CommitObject(commit)
+	ErrCheck(err)
+	return err
 }
 
 func GitPush() error {
