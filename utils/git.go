@@ -70,7 +70,7 @@ func GitAdd() {
 
 // if not staged, it will accept a list of strings to be passed to git
 // as arguments
-func GitDiff(staged bool, args []string) (string) { 
+func GitDiff(staged bool, args []string) (string) {
 	if (staged) {
 		cmd = exec.Command("git", "diff", "--staged", "HEAD")
 	} else {

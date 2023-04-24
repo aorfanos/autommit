@@ -1,5 +1,5 @@
 FROM golang:1.19-alpine AS build-env
-ENV CGO_ENABLED=0 
+ENV CGO_ENABLED=0
 COPY . /build
 WORKDIR /build
 RUN go build -a -installsuffix cgo -ldflags "-w -s" -o autommit cmd/autommit/main.go

@@ -1,7 +1,7 @@
 [![Build and Deploy](https://github.com/aorfanos/autommit/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/aorfanos/autommit/actions/workflows/build.yaml)
 # autommit
 
-## Description 
+## Description
 
 Autommit is a simple tool to automatically commit and push changes to a git repository.
 
