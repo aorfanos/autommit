@@ -41,7 +41,6 @@ jobs:
   build-docker:
     name: Build docker image
     needs: [build-binaries]
-    runs_on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
