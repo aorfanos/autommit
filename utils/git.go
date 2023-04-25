@@ -90,10 +90,13 @@ func (a *Autommit) GitAddDialogue() {
 	_, err = a.GitConfig.Worktree.Add(result)
 	ErrCheck(err)
 
-	addAnother, err := ProceedSelector("Add another file?", []string{"✅ Yes", "❌ No"})
+	addAnother, err := ProceedSelector("Add another file?", []string{"✅ Yes", "⏩ No", "❌ Exit"})
 	ErrCheck(err)
 	if (addAnother == "✅ Yes") {
 		a.GitAddDialogue()
+	} else if (addAnother == "❌ Exit") {
+		a.UnstageFiles()
+		os.Exit(0) 
 	} else {
 		return
 	}
