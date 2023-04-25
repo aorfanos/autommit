@@ -3,8 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"os/user"
+	"path/filepath"
 
 	"github.com/manifoldco/promptui"
+	"github.com/muja/goconfig"
 )
 
 func ErrCheck(err error) {
@@ -44,4 +48,20 @@ func ProceedEditor(title, target string) (string, error) {
 	result, err := prompt.Run()
 	ErrCheck(err)
 	return result, err
+}
+
+func (a *Autommit) PopulateGitUserInfo() (error) {
+	user, err := user.Current()
+	ErrCheck(err)
+
+	gitconfig := filepath.Join(user.HomeDir, ".gitconfig")
+	bytes, err := ioutil.ReadFile(gitconfig)
+	ErrCheck(err)
+
+	config, _, err := goconfig.Parse(bytes)
+	ErrCheck(err)
+
+	a.GitConfig.Author = config["user.name"]
+	a.GitConfig.AuthorMail = config["user.email"]
+	return err
 }
