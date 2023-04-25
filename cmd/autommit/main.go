@@ -55,7 +55,9 @@ func main() {
 	COMPLETIONLOOP:
 	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff(true, nil), *signCommitsMessage))
 	if err != nil {
+		// if there's an issue reaching the OpenAI API, we unstage the files
 		fmt.Println(err)
+		autommit.UnstageFiles()
 		os.Exit(1)
 		return
 	}
