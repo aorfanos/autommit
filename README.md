@@ -11,6 +11,14 @@ It uses the OpenAI API and your local `git` cli to generate appropriate commit m
 
 - OpenAI API key
 - `git` executable in your $PATH
+- If you want to sign/verify your commits, make sure you have a PGP key pair (public and private keys). If you don't have a PGP key pair, you can generate one using [GnuPG](https://gnupg.org/). Then provide the `--pgp-key-path` flag to autommit as follows:
+
+:warning: **Note**: Do **not** use a password for your PGP key. autommit can't handle it (:
+
+```shell
+autommit --pgp-key-path /path/to/your/pgp/key
+```
+
 
 ## Usage
 
