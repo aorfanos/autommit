@@ -50,6 +50,9 @@ func main() {
 	)
 	utils.ErrCheck(err)
 
+	// get pgp keyring
+	autommit.GetOpenPGPKeyring()
+
 	// add files to the commit
 	autommit.GitAddDialogue()
 
