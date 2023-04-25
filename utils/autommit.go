@@ -9,6 +9,7 @@ import (
 )
 
 type Autommit struct {
+	Version string
 	OpenAiApiKey string
 	Context context.Context
 	OpenAiClient openai.Client
@@ -18,7 +19,7 @@ type Autommit struct {
 	GitConfig GitConfig
 }
 
-func NewAutommit(openAiApiKey, commitType, path, pgpKeyPath string) (*Autommit, error) {
+func NewAutommit(version, openAiApiKey, commitType, path, pgpKeyPath, gitConfig string) (*Autommit, error) {
 	ctx := context.Background()
 	client := openai.NewClient(openAiApiKey)
 	repo, err := git.PlainOpen(path)
@@ -34,6 +35,7 @@ func NewAutommit(openAiApiKey, commitType, path, pgpKeyPath string) (*Autommit, 
 		Type: commitType,
 		PgpKeyPath: pgpKeyPath,
 		GitConfig: GitConfig{
+			FilePath: gitConfig,
 			RepoPath: path,
 			Repo: repo,
 			Worktree: workTree,

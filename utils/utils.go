@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os/user"
 	"path/filepath"
 
@@ -13,9 +14,15 @@ import (
 
 func ErrCheck(err error) {
 	if (err != nil) {
-		fmt.Printf("error: %s\n", err.Error())
-		return
+		log.Fatal(fmt.Sprintf("error: %s\n", err.Error()))
 	}
+}
+
+func ErrReturn(err error) error {
+	if (err != nil) {
+		return err
+	}
+	return nil
 }
 
 func (a *Autommit) ParseStringAsJson(strSrc string) (error) {
@@ -50,18 +57,32 @@ func ProceedEditor(title, target string) (string, error) {
 	return result, err
 }
 
+// func PopulateGitUserInfo() will parse a .gitconfig file
+// and populate the Autommit struct with the user's name and email
 func (a *Autommit) PopulateGitUserInfo() (error) {
 	user, err := user.Current()
-	ErrCheck(err)
+	ErrReturn(err)
 
-	gitconfig := filepath.Join(user.HomeDir, ".gitconfig")
-	bytes, err := ioutil.ReadFile(gitconfig)
-	ErrCheck(err)
+	if (a.GitConfig.FilePath == "~/.gitconfig") {
+		a.GitConfig.FilePath = filepath.Join(user.HomeDir, ".gitconfig")
+	}
+
+	bytes, err := ioutil.ReadFile(a.GitConfig.FilePath)
+	ErrReturn(err)
 
 	config, _, err := goconfig.Parse(bytes)
-	ErrCheck(err)
+	ErrReturn(err)
 
 	a.GitConfig.Author = config["user.name"]
 	a.GitConfig.AuthorMail = config["user.email"]
+
+	if (a.GitConfig.Author == "" || a.GitConfig.AuthorMail == "") {
+		err = fmt.Errorf("No git user info found, will not proceed")
+	}
+
 	return err
+}
+
+func ShowVersion(version string) {
+	fmt.Printf("Autommit version %s 🦄\n", version)
 }

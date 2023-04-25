@@ -27,6 +27,7 @@ type GitConfig struct {
 	Author string
 	AuthorMail string
 	RepoPath string
+	FilePath string
 	Repo *git.Repository
 	Worktree *git.Worktree
 	HeadRef *plumbing.Reference
@@ -68,13 +69,20 @@ func (a *Autommit) GitAddDialogue() {
 	index := -1
 	var result string
 
+	fileList = append(fileList, "⏩ Proceed to commit")
+
 	for index < 0 {
 		prompt := promptui.SelectWithAdd{
+			AddLabel: "Custom path (e.g. '.' or 'src/')",
 			Label: gitAddSelectorQTitle,
 			Items: fileList,
 		}
 
 		index, result, err = prompt.Run()
+
+		if (result == "⏩ Proceed to commit") {
+			return
+		}
 
 		if (index == -1) {
 			fileList = append(fileList, result)
@@ -89,10 +97,13 @@ func (a *Autommit) GitAddDialogue() {
 	_, err = a.GitConfig.Worktree.Add(result)
 	ErrCheck(err)
 
-	addAnother, err := ProceedSelector("Add another file?", []string{"✅ Yes", "❌ No"})
+	addAnother, err := ProceedSelector("Add another file?", []string{"✅ Yes", "⏩ Take me to commit", "❌ Exit"})
 	ErrCheck(err)
 	if (addAnother == "✅ Yes") {
 		a.GitAddDialogue()
+	} else if (addAnother == "❌ Exit") {
+		a.UnstageFiles()
+		os.Exit(0)
 	} else {
 		return
 	}

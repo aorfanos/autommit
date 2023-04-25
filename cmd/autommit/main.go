@@ -8,6 +8,8 @@ import (
 	"github.com/aorfanos/autommit/utils"
 )
 
+const version = "0.0.7"
+
 var (
 	openAiApiKey = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
 	path = flag.String("path", ".", "Path to the git repository")
@@ -16,6 +18,8 @@ var (
 	convCommitsType = flag.String("conventional-commits-type", "feat", "Will add the provided type to the commit message")
 	gitUser = flag.String("git-user", "", "Will set the git user")
 	gitEmail = flag.String("git-mail", "", "Will set the git email")
+	gitConfigPath = flag.String("git-config-path", "~/.gitconfig", "Will set the git config path")
+	showVersion = flag.Bool("version", false, "Will show the version of autommit")
 	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
 
@@ -25,6 +29,10 @@ func init() {
 
 func main() {
 	flag.Parse()
+	if (*showVersion) {
+		utils.ShowVersion(version)
+		os.Exit(0)
+	}
 	// redundant loop since we use the envvar as default for openAiApiKey
 	// @TODO: reassess
 	if (*openAiApiKey == "") {
@@ -41,19 +49,26 @@ func main() {
 	utils.CheckGitPresence()
 
 	autommit, err := utils.NewAutommit(
+		version,
 		*openAiApiKey,
 		*convCommitsType,
 		*path,
 		*pgpKeyPath,
+		*gitConfigPath,
 	)
 	utils.ErrCheck(err)
 
 	// get git user info from .gitconfig
-	autommit.PopulateGitUserInfo()
+	err = autommit.PopulateGitUserInfo()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	// get pgp keyring
 	if (*pgpKeyPath != "") {
-		autommit.GetOpenPGPKeyring()
+		err = autommit.GetOpenPGPKeyring()
+		utils.ErrCheck(err)
 	} else {
 		fmt.Println("No PGP key provided. Will not sign commits.")
 	}

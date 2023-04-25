@@ -10,16 +10,22 @@ import (
 func (a *Autommit) GetOpenPGPKeyring() (err error) {
 	// open the keyring
 	keyringFile, err := os.Open(a.PgpKeyPath)
-	ErrCheck(err)
+	if err != nil {
+		return err
+	}
 	defer keyringFile.Close()
 
 	// Read the armored keyring
 	block, err := armor.Decode(keyringFile)
-	ErrCheck(err)
+	if err != nil {
+		return err
+	}
 
 	// get the keyring
 	keyring, err := openpgp.ReadKeyRing(block.Body)
-	ErrCheck(err)
+	if err != nil {
+		return err
+	}
 
 	a.GitConfig.PGPKeyRing = keyring
 	return err
