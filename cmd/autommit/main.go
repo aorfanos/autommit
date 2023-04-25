@@ -31,6 +31,7 @@ func main() {
 	flag.Parse()
 	if (*showVersion) {
 		utils.ShowVersion(version)
+		os.Exit(0)
 	}
 	// redundant loop since we use the envvar as default for openAiApiKey
 	// @TODO: reassess
@@ -66,7 +67,8 @@ func main() {
 
 	// get pgp keyring
 	if (*pgpKeyPath != "") {
-		autommit.GetOpenPGPKeyring()
+		err = autommit.GetOpenPGPKeyring()
+		utils.ErrCheck(err)
 	} else {
 		fmt.Println("No PGP key provided. Will not sign commits.")
 	}

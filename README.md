@@ -1,4 +1,5 @@
 [![Build and Deploy](https://github.com/aorfanos/autommit/actions/workflows/build.yaml/badge.svg?branch=main)](https://github.com/aorfanos/autommit/actions/workflows/build.yaml)
+[![Go Test](https://github.com/aorfanos/autommit/actions/workflows/test.yaml/badge.svg)](https://github.com/aorfanos/autommit/actions/workflows/test.yaml)
 # autommit
 
 ## Description
