@@ -12,13 +12,13 @@ type Autommit struct {
 	OpenAiApiKey string
 	Context context.Context
 	OpenAiClient openai.Client
-	PgpSign bool
+	PgpKeyPath string
 	CommitInfo Commit
 	Type string
 	GitConfig GitConfig
 }
 
-func NewAutommit(openAiApiKey, commitType, path, gitUser, gitEmail string) (*Autommit, error) {
+func NewAutommit(openAiApiKey, commitType, path, gitUser, gitEmail, pgpKeyPath string) (*Autommit, error) {
 	ctx := context.Background()
 	client := openai.NewClient(openAiApiKey)
 	repo, err := git.PlainOpen(path)
@@ -27,11 +27,14 @@ func NewAutommit(openAiApiKey, commitType, path, gitUser, gitEmail string) (*Aut
 	ErrCheck(err)
 	headRef, err := repo.Head()
 	ErrCheck(err)
+	// pgpKeyRing, err := GetOpenPGPKeyring(pgpKeyPath)
+	// ErrCheck(err)
 	return &Autommit{
 		OpenAiApiKey: openAiApiKey,
 		Context: ctx,
 		OpenAiClient: *client,
 		Type: commitType,
+		PgpKeyPath: pgpKeyPath,
 		GitConfig: GitConfig{
 			Author: gitUser,
 			AuthorMail: gitEmail,
@@ -39,6 +42,7 @@ func NewAutommit(openAiApiKey, commitType, path, gitUser, gitEmail string) (*Aut
 			Repo: repo,
 			Worktree: workTree,
 			HeadRef: headRef,
+			// PGPKeyRing: pgpKeyRing,
 		},
 	}, nil
 }
