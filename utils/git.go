@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/ProtonMail/go-crypto/openpgp"
-	"github.com/ProtonMail/go-crypto/openpgp/armor"
 	git "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -31,7 +30,7 @@ type GitConfig struct {
 	Repo *git.Repository
 	Worktree *git.Worktree
 	HeadRef *plumbing.Reference
-	PGPKeyRing openpgp.KeyRing
+	PGPKeyRing openpgp.EntityList
 }
 
 
@@ -141,25 +140,6 @@ func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 }
 
 func (a *Autommit) GitCommit() (error) {
-	// Read the PGP key from a file, or use any other method to obtain the key.
-	keyRingFile, err := os.Open(a.PgpKeyPath)
-	if err != nil {
-		return err
-	}
-	defer keyRingFile.Close()
-
-	// Read the armored keyring
-	block, err := armor.Decode(keyRingFile)
-	if err != nil {
-		return err
-	}
-
-	// Read the keyring
-	keyRing, err := openpgp.ReadKeyRing(block.Body)
-	if err != nil {
-		return err
-	}
-
 	// Get the current HEAD reference
 	headRef, err := a.GitConfig.Repo.Head()
 	if err != nil {
@@ -187,7 +167,7 @@ func (a *Autommit) GitCommit() (error) {
 			Author:    author,
 			Committer: author,
 			Parents:   []plumbing.Hash{headCommit.Hash},
-			SignKey:   keyRing[0],
+			SignKey:   a.GitConfig.PGPKeyRing[0],
 		},
 	)
 	ErrCheck(err)

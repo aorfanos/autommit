@@ -27,8 +27,6 @@ func NewAutommit(openAiApiKey, commitType, path, gitUser, gitEmail, pgpKeyPath s
 	ErrCheck(err)
 	headRef, err := repo.Head()
 	ErrCheck(err)
-	// pgpKeyRing, err := GetOpenPGPKeyring(pgpKeyPath)
-	// ErrCheck(err)
 	return &Autommit{
 		OpenAiApiKey: openAiApiKey,
 		Context: ctx,
@@ -42,7 +40,6 @@ func NewAutommit(openAiApiKey, commitType, path, gitUser, gitEmail, pgpKeyPath s
 			Repo: repo,
 			Worktree: workTree,
 			HeadRef: headRef,
-			// PGPKeyRing: pgpKeyRing,
 		},
 	}, nil
 }
