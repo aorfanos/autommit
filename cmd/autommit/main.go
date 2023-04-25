@@ -49,7 +49,11 @@ func main() {
 	utils.ErrCheck(err)
 
 	// get git user info from .gitconfig
-	autommit.PopulateGitUserInfo()
+	err = autommit.PopulateGitUserInfo()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	// get pgp keyring
 	if (*pgpKeyPath != "") {
