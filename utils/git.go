@@ -27,6 +27,7 @@ type GitConfig struct {
 	Author string
 	AuthorMail string
 	RepoPath string
+	FilePath string
 	Repo *git.Repository
 	Worktree *git.Worktree
 	HeadRef *plumbing.Reference

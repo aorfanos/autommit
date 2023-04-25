@@ -16,6 +16,7 @@ var (
 	convCommitsType = flag.String("conventional-commits-type", "feat", "Will add the provided type to the commit message")
 	gitUser = flag.String("git-user", "", "Will set the git user")
 	gitEmail = flag.String("git-mail", "", "Will set the git email")
+	gitConfigPath = flag.String("git-config-path", "~/.gitconfig", "Will set the git config path")
 	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
 
@@ -45,6 +46,7 @@ func main() {
 		*convCommitsType,
 		*path,
 		*pgpKeyPath,
+		*gitConfigPath,
 	)
 	utils.ErrCheck(err)
 

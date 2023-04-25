@@ -18,6 +18,13 @@ func ErrCheck(err error) {
 	}
 }
 
+func ErrReturn(err error) error {
+	if (err != nil) {
+		return err
+	}
+	return nil
+}
+
 func (a *Autommit) ParseStringAsJson(strSrc string) (error) {
 	var c Commit
 	err := json.Unmarshal([]byte(strSrc), &c)
@@ -50,16 +57,21 @@ func ProceedEditor(title, target string) (string, error) {
 	return result, err
 }
 
+// func PopulateGitUserInfo() will parse a .gitconfig file
+// and populate the Autommit struct with the user's name and email
 func (a *Autommit) PopulateGitUserInfo() (error) {
 	user, err := user.Current()
-	ErrCheck(err)
+	ErrReturn(err)
 
-	gitconfig := filepath.Join(user.HomeDir, ".gitconfig")
-	bytes, err := ioutil.ReadFile(gitconfig)
-	ErrCheck(err)
+	if (a.GitConfig.FilePath == "~/.gitconfig") {
+		a.GitConfig.FilePath = filepath.Join(user.HomeDir, ".gitconfig")
+	} 
+
+	bytes, err := ioutil.ReadFile(a.GitConfig.FilePath)
+	ErrReturn(err)
 
 	config, _, err := goconfig.Parse(bytes)
-	ErrCheck(err)
+	ErrReturn(err)
 
 	a.GitConfig.Author = config["user.name"]
 	a.GitConfig.AuthorMail = config["user.email"]

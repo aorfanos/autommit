@@ -198,3 +198,64 @@ func TestProceedEditor(t *testing.T) {
 		})
 	}
 }
+
+func TestAutommit_PopulateGitUserInfo(t *testing.T) {
+	type fields struct {
+		OpenAiApiKey string
+		Context      context.Context
+		OpenAiClient openai.Client
+		PgpKeyPath   string
+		CommitInfo   Commit
+		Type         string
+		GitConfig    GitConfig
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			name: "TestNonExistingGitConfig",
+			fields: fields{
+				GitConfig: GitConfig{
+					FilePath: "/home/testdir/.gitconfig",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "TestExistingGitConfig",
+			fields: fields{
+				GitConfig: GitConfig{
+					FilePath: "./testdir/.gitconfig",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "TestPartialGitConfig",
+			fields: fields{
+				GitConfig: GitConfig{
+					FilePath: "./testdir/.gitconfig.partial",
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := &Autommit{
+				OpenAiApiKey: tt.fields.OpenAiApiKey,
+				Context:      tt.fields.Context,
+				OpenAiClient: tt.fields.OpenAiClient,
+				PgpKeyPath:   tt.fields.PgpKeyPath,
+				CommitInfo:   tt.fields.CommitInfo,
+				Type:         tt.fields.Type,
+				GitConfig:    tt.fields.GitConfig,
+			}
+			if err := a.PopulateGitUserInfo(); (err != nil) != tt.wantErr {
+				t.Errorf("Autommit.PopulateGitUserInfo() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
