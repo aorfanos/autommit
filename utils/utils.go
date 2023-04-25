@@ -3,7 +3,6 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"strings"
 
 	"github.com/manifoldco/promptui"
 )
@@ -45,17 +44,4 @@ func ProceedEditor(title, target string) (string, error) {
 	result, err := prompt.Run()
 	ErrCheck(err)
 	return result, err
-}
-
-func PopulateFileAddSelector(gitDiffChangesString string) ([]string, error) {
-	if (gitDiffChangesString == "") {
-		return []string{}, fmt.Errorf("No files to add")
-	}
-	// Split the string by newlines, trim the trailing newline and trim the spaces
-	splitted := strings.Split(strings.TrimSuffix(gitDiffChangesString, "\n"), "\n")
-	for i, v := range splitted {
-		splitted[i] = strings.TrimSpace(v)
-		splitted[i] = strings.TrimSuffix(splitted[i], "\n")
-	}
-	return splitted, nil
 }
