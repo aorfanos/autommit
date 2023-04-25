@@ -11,7 +11,7 @@ import (
 var (
 	openAiApiKey = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
 	path = flag.String("path", ".", "Path to the git repository")
-	pgpSignedCommit = flag.Bool("pgp-sign", true, "Will sign the commit with the default PGP key")
+	pgpKeyPath = flag.String("pgp-key-path", "", "Path to the PGP key")
 	signCommitsMessage = flag.String("sign-commits-with-message", "Created by autommit 🦄", "Will add the provided message to the long commit message")
 	convCommitsType = flag.String("conventional-commits-type", "feat", "Will add the provided type to the commit message")
 	gitUser = flag.String("git-user", "", "Will set the git user")
@@ -46,6 +46,7 @@ func main() {
 		*path,
 		*gitUser,
 		*gitEmail,
+		*pgpKeyPath,
 	)
 	utils.ErrCheck(err)
 

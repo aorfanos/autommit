@@ -10,7 +10,7 @@ import (
 
 func ErrCheck(err error) {
 	if (err != nil) {
-		fmt.Printf("error: %s", err)
+		fmt.Printf("error: %s\n", err.Error())
 		return
 	}
 }
