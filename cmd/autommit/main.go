@@ -11,9 +11,11 @@ import (
 var (
 	openAiApiKey = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
 	path = flag.String("path", ".", "Path to the git repository")
-	pgpSignedCommit = flag.Bool("pgp-sign", true, "Will sign the commit with the default PGP key")
+	pgpKeyPath = flag.String("pgp-key-path", "", "Path to the PGP key")
 	signCommitsMessage = flag.String("sign-commits-with-message", "Created by autommit 🦄", "Will add the provided message to the long commit message")
 	convCommitsType = flag.String("conventional-commits-type", "feat", "Will add the provided type to the commit message")
+	gitUser = flag.String("git-user", "", "Will set the git user")
+	gitEmail = flag.String("git-mail", "", "Will set the git email")
 	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
 
@@ -38,8 +40,22 @@ func main() {
 	// check if git is present in the system
 	utils.CheckGitPresence()
 
-	autommit, err := utils.NewAutommit(*openAiApiKey, *convCommitsType, *path)
+	autommit, err := utils.NewAutommit(
+		*openAiApiKey,
+		*convCommitsType,
+		*path,
+		*gitUser,
+		*gitEmail,
+		*pgpKeyPath,
+	)
 	utils.ErrCheck(err)
+
+	// get pgp keyring
+	if (*pgpKeyPath != "") {
+		autommit.GetOpenPGPKeyring()
+	} else {
+		fmt.Println("No PGP key provided. Will not sign commits.")
+	}
 
 	// add files to the commit
 	autommit.GitAddDialogue()
@@ -47,7 +63,9 @@ func main() {
 	COMPLETIONLOOP:
 	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff(true, nil), *signCommitsMessage))
 	if err != nil {
+		// if there's an issue reaching the OpenAI API, we unstage the files
 		fmt.Println(err)
+		autommit.UnstageFiles()
 		os.Exit(1)
 		return
 	}
@@ -55,9 +73,9 @@ func main() {
 	err = autommit.ParseStringAsJson(answer)
 	utils.ErrCheck(err)
 
-	if (autommit.GitCommit()) {
+	if (autommit.GitCommitDialogue()) {
 		fmt.Println("Commit successful. Proceeding to push routine.")
-		utils.GitPush()
+		autommit.GitPush()
 	} else {
 		fmt.Println("Will recreate a message")
 		goto COMPLETIONLOOP

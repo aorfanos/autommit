@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
+	"github.com/ProtonMail/go-crypto/openpgp"
 	git "github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/manifoldco/promptui"
 )
 
@@ -20,15 +24,20 @@ var (
 )
 
 type GitConfig struct {
+	Author string
+	AuthorMail string
 	RepoPath string
 	Repo *git.Repository
 	Worktree *git.Worktree
+	HeadRef *plumbing.Reference
+	PGPKeyRing openpgp.EntityList
 }
 
 
 type Commit struct {
 	Message string `json:"commit_message"`
 	MessageLong string `json:"commit_message_long"`
+	FilesAffected []string `json:"files_affected"`
 }
 
 func CheckGitPresence() bool {
@@ -37,12 +46,22 @@ func CheckGitPresence() bool {
 	return err == nil
 }
 
+// func GitAddDialogue will ask the user to select files to add to the commit
+// if no files are available to select and no files are already staged, it will exit the program
+// if no files are available to select but some files are already staged, it will proceed to the commit dialogue
 func (a *Autommit) GitAddDialogue() {
 	fileList, err := a.PopulateFileList()
 	ErrCheck(err)
 
+	stagedFilesExist, _ := a.CheckForStagedFiles()
+
 	if (len(fileList) == 0) {
-		fmt.Println("No new files to stage, proceeding to commit dialogue")
+		if (!stagedFilesExist) {
+			fmt.Println("No files to stage, or already staged - exiting")
+			os.Exit(0)
+		} else {
+			fmt.Println("No new files to stage, proceeding to commit dialogue")
+		}
 		return
 	}
 
@@ -92,12 +111,17 @@ func GitDiff(staged bool, args []string) (string) {
 	return string(diff)
 }
 
-func (a *Autommit) GitCommit() (regenerate bool) {
+// func GitCommitDialogue will walk the user through git the git commit dialogue
+// and return a boolean indicating whether the commit message is accepted by the user or not
+// if the user selects "regenerate", it will return false, prompting the program to regenerate the commit message
+func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 	result, err := ProceedSelector(gitCommitSelectorQTitle, gitCommitSelectorQChoices)
 	ErrCheck(err)
+
 	IF_EVAL_START:
 	if (result == gitCommitSelectorQChoices[1]) { // no
-		fmt.Println("Commit aborted")
+		// unstage all files and exit
+		a.UnstageFiles()
 		os.Exit(0)
 	} else if (result == gitCommitSelectorQChoices[2]) { // regenerate
 		return false
@@ -112,28 +136,75 @@ func (a *Autommit) GitCommit() (regenerate bool) {
 		result = gitCommitSelectorQChoices[0]
 		goto IF_EVAL_START
 	} else if (result == gitCommitSelectorQChoices[0]) { // yes
-		if (a.PgpSign) {
-			cmd = exec.Command("git", "commit", "-S", "-m", a.CommitInfo.Message, "-m", a.CommitInfo.MessageLong)
-		} else {
-			cmd = exec.Command("git", "commit", "-m", a.CommitInfo.Message, "-m", a.CommitInfo.MessageLong)
-		}
-		_, err := cmd.Output()
+		err = a.GitCommit()
 		ErrCheck(err)
 		return true
 	}
 	return
 }
 
-func GitPush() error {
+func (a *Autommit) GitCommit() (error) {
+	// Get the current HEAD reference
+	headRef, err := a.GitConfig.Repo.Head()
+	if err != nil {
+		return err
+	}
+
+	// Get the commit at the HEAD
+	headCommit, err := a.GitConfig.Repo.CommitObject(headRef.Hash())
+	if err != nil {
+		return err
+	}
+
+	// Create a new commit message
+	commitMessage := fmt.Sprintf("%s\n\n%s", a.CommitInfo.Message, a.CommitInfo.MessageLong)
+	author := &object.Signature{
+		Name:  fmt.Sprintf("%s", a.GitConfig.Author),
+		Email: fmt.Sprintf("%s", a.GitConfig.AuthorMail),
+		When:  time.Now(),
+	}
+
+	var commitHash plumbing.Hash
+
+	if (a.PgpKeyPath == "") {
+		// Create the unsigned commit
+		commitHash, err = a.GitConfig.Worktree.Commit(
+			commitMessage,
+			&git.CommitOptions{
+				Author: author,
+				Committer: author,
+			},
+		)
+	} else {
+		// Create the commit with the PGP signature
+		commitHash, err = a.GitConfig.Worktree.Commit(
+			commitMessage,
+			&git.CommitOptions{
+				Author:    author,
+				Committer: author,
+				Parents:   []plumbing.Hash{headCommit.Hash},
+				SignKey:   a.GitConfig.PGPKeyRing[0],
+			},
+		)
+		ErrCheck(err)
+	}
+
+	// commit the file(s)
+	_, err = a.GitConfig.Repo.CommitObject(commitHash)
+	ErrCheck(err)
+	return err
+}
+
+func (a *Autommit) GitPush() error {
 	result, err := ProceedSelector(gitPushSelectorQTitle, gitPushSelectorQChoices)
 	ErrCheck(err)
 
 	if (result == gitPushSelectorQChoices[1]) { // no
 		fmt.Println("Push aborted")
+		a.UnstageFiles()
 		return nil
 	} else if (result == gitPushSelectorQChoices[0]) { // yes
-		cmd := exec.Command("git", "push")
-		_, err := cmd.Output()
+		err = a.GitConfig.Repo.Push(&git.PushOptions{})
 		return err
 	}
 	return nil
@@ -150,12 +221,38 @@ func (a *Autommit) PopulateFileList() ([]string, error) {
 	// populate file list
 	for fileName, fileStatus := range files {
 		// skip files that are staged
-		if (fileStatus.Staging == git.Modified || 
+		if (fileStatus.Staging == git.Modified ||
 			fileStatus.Staging == git.Added) {
 			continue
 		} else {
 			fileList = append(fileList, fileName)
+			a.CommitInfo.FilesAffected = append(a.CommitInfo.FilesAffected, fileName)
 		}
 	}
 	return fileList, err
+}
+
+// CheckForStagedFiles checks if there are any staged files
+// if there are, it will return true, and list them
+func (a *Autommit) CheckForStagedFiles() (exist bool, fileNames []string) {
+	files, err := a.GitConfig.Worktree.Status()
+	ErrCheck(err)
+
+	for fileName, fileStatus := range files {
+		if (fileStatus.Staging == git.Modified ||
+			fileStatus.Staging == git.Added) {
+			fileNames = append(fileNames, fileName)
+			return true, fileNames
+		}
+	}
+	return false, nil
+}
+
+// UnstageFiles unstages all files
+func (a *Autommit) UnstageFiles() (error) {
+	err := a.GitConfig.Worktree.Reset(&git.ResetOptions{
+		Mode: git.MixedReset,
+	})
+	ErrCheck(err)
+	return err
 }
