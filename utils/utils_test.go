@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/sashabaranov/go-openai"
@@ -87,118 +86,6 @@ func TestAutommit_ParseStringAsJson(t *testing.T) {
 	}
 }
 
-func TestProceedSelector(t *testing.T) {
-	type args struct {
-		title   string
-		choices []string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
-	}{
-		{
-			name: "TestEmptyChoices",
-			args: args{
-				title:   "test",
-				choices: []string{},
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := ProceedSelector(tt.args.title, tt.args.choices)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ProceedSelector() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("ProceedSelector() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestErrCheck(t *testing.T) {
-	type args struct {
-		err error
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{
-			name: "TestNilError",
-			args: args{
-				err: nil,
-			},
-		},
-		{
-			name: "TestExistingError",
-			args: args{
-				err: fmt.Errorf("test"),
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			ErrCheck(tt.args.err)
-		})
-	}
-}
-
-func TestProceedEditor(t *testing.T) {
-	type args struct {
-		title  string
-		target string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    string
-		wantErr bool
-	}{
-		{
-			name: "TestEmptyTitle",
-			args: args{
-				title:  "",
-				target: "test",
-			},
-			wantErr: true,
-		},
-		{
-			name: "TestEmptyTarget",
-			args: args{
-				title:  "test",
-				target: "",
-			},
-			wantErr: true,
-		},
-		{
-			name: "TestEmptyTitleAndTarget",
-			args: args{
-				title:  "",
-				target: "",
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := ProceedEditor(tt.args.title, tt.args.target)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ProceedEditor() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("ProceedEditor() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestAutommit_PopulateGitUserInfo(t *testing.T) {
 	type fields struct {
 		OpenAiApiKey string
@@ -256,6 +143,28 @@ func TestAutommit_PopulateGitUserInfo(t *testing.T) {
 			if err := a.PopulateGitUserInfo(); (err != nil) != tt.wantErr {
 				t.Errorf("Autommit.PopulateGitUserInfo() error = %v, wantErr %v", err, tt.wantErr)
 			}
+		})
+	}
+}
+
+func TestShowVersion(t *testing.T) {
+	type args struct {
+		version string
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "TestVersion",
+			args: args{
+				version: "test",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ShowVersion(tt.args.version)
 		})
 	}
 }

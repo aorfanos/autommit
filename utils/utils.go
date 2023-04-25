@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"os"
+	"log"
 	"os/user"
 	"path/filepath"
 
@@ -14,8 +14,7 @@ import (
 
 func ErrCheck(err error) {
 	if (err != nil) {
-		fmt.Printf("error: %s\n", err.Error())
-		return
+		log.Fatal(fmt.Sprintf("error: %s\n", err.Error()))
 	}
 }
 
@@ -66,7 +65,7 @@ func (a *Autommit) PopulateGitUserInfo() (error) {
 
 	if (a.GitConfig.FilePath == "~/.gitconfig") {
 		a.GitConfig.FilePath = filepath.Join(user.HomeDir, ".gitconfig")
-	} 
+	}
 
 	bytes, err := ioutil.ReadFile(a.GitConfig.FilePath)
 	ErrReturn(err)
@@ -86,5 +85,4 @@ func (a *Autommit) PopulateGitUserInfo() (error) {
 
 func ShowVersion(version string) {
 	fmt.Printf("Autommit version %s 🦄\n", version)
-	os.Exit(0)
 }
