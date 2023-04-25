@@ -44,11 +44,12 @@ func main() {
 		*openAiApiKey,
 		*convCommitsType,
 		*path,
-		*gitUser,
-		*gitEmail,
 		*pgpKeyPath,
 	)
 	utils.ErrCheck(err)
+
+	// get git user info from .gitconfig
+	autommit.PopulateGitUserInfo()
 
 	// get pgp keyring
 	if (*pgpKeyPath != "") {
