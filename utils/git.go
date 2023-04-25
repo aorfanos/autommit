@@ -111,12 +111,16 @@ func GitDiff(staged bool, args []string) (string) {
 	return string(diff)
 }
 
+// func GitCommitDialogue will walk the user through git the git commit dialogue
+// and return a boolean indicating whether the commit message is accepted by the user or not
+// if the user selects "regenerate", it will return false, prompting the program to regenerate the commit message
 func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 	result, err := ProceedSelector(gitCommitSelectorQTitle, gitCommitSelectorQChoices)
 	ErrCheck(err)
+
 	IF_EVAL_START:
 	if (result == gitCommitSelectorQChoices[1]) { // no
-		// unstage all files
+		// unstage all files and exit
 		a.UnstageFiles()
 		os.Exit(0)
 	} else if (result == gitCommitSelectorQChoices[2]) { // regenerate
