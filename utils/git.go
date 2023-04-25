@@ -160,17 +160,30 @@ func (a *Autommit) GitCommit() (error) {
 		When:  time.Now(),
 	}
 
-	// Create the commit with the PGP signature
-	commitHash, err := a.GitConfig.Worktree.Commit(
-		commitMessage,
-		&git.CommitOptions{
-			Author:    author,
-			Committer: author,
-			Parents:   []plumbing.Hash{headCommit.Hash},
-			SignKey:   a.GitConfig.PGPKeyRing[0],
-		},
-	)
-	ErrCheck(err)
+	var commitHash plumbing.Hash
+
+	if (a.PgpKeyPath == "") {
+		// Create the unsigned commit
+		commitHash, err = a.GitConfig.Worktree.Commit(
+			commitMessage,
+			&git.CommitOptions{
+				Author: author,
+				Committer: author,
+			},
+		)
+	} else {
+		// Create the commit with the PGP signature
+		commitHash, err = a.GitConfig.Worktree.Commit(
+			commitMessage,
+			&git.CommitOptions{
+				Author:    author,
+				Committer: author,
+				Parents:   []plumbing.Hash{headCommit.Hash},
+				SignKey:   a.GitConfig.PGPKeyRing[0],
+			},
+		)
+		ErrCheck(err)
+	}
 
 	// commit the file(s)
 	_, err = a.GitConfig.Repo.CommitObject(commitHash)
