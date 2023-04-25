@@ -8,6 +8,8 @@ import (
 	"github.com/aorfanos/autommit/utils"
 )
 
+const version = "0.0.7"
+
 var (
 	openAiApiKey = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
 	path = flag.String("path", ".", "Path to the git repository")
@@ -17,6 +19,7 @@ var (
 	gitUser = flag.String("git-user", "", "Will set the git user")
 	gitEmail = flag.String("git-mail", "", "Will set the git email")
 	gitConfigPath = flag.String("git-config-path", "~/.gitconfig", "Will set the git config path")
+	showVersion = flag.Bool("version", false, "Will show the version of autommit")
 	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
 
@@ -26,6 +29,9 @@ func init() {
 
 func main() {
 	flag.Parse()
+	if (*showVersion) {
+		utils.ShowVersion(version)
+	}
 	// redundant loop since we use the envvar as default for openAiApiKey
 	// @TODO: reassess
 	if (*openAiApiKey == "") {
@@ -42,6 +48,7 @@ func main() {
 	utils.CheckGitPresence()
 
 	autommit, err := utils.NewAutommit(
+		version,
 		*openAiApiKey,
 		*convCommitsType,
 		*path,

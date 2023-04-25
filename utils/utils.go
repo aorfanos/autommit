@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"os/user"
 	"path/filepath"
 
@@ -81,4 +82,9 @@ func (a *Autommit) PopulateGitUserInfo() (error) {
 	}
 
 	return err
+}
+
+func ShowVersion(version string) {
+	fmt.Printf("Autommit version %s 🦄\n", version)
+	os.Exit(0)
 }
