@@ -76,6 +76,8 @@ sudo mv autommit /usr/local/bin
 
 2. Use the Docker image
 
+:warning: **Note**: The Docker image is currently unstable. Prefer the binary builds. Use at your own risk.
+
 ```shell
 docker run -it -e OPENAI_API_KEY=$OPENAI_API_KEY -e GIT_ACC_MAIL="$(git config user.email)" -e GIT_ACC_NAME="$(git config user.name)" -v $(pwd):/app:rw ghcr.io/aorfanos/autommit:latest
 ```
