@@ -3,7 +3,6 @@ package utils
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"testing"
 
 	"github.com/sashabaranov/go-openai"
@@ -79,7 +78,6 @@ func TestAutommit_ParseStringAsJson(t *testing.T) {
 				OpenAiApiKey: tt.fields.OpenAiApiKey,
 				Context:      tt.fields.Context,
 				OpenAiClient: tt.fields.OpenAiClient,
-				PgpSign:      tt.fields.PgpSign,
 				CommitInfo:   tt.fields.CommitInfo,
 			}
 			if err := a.ParseStringAsJson(tt.args.strSrc); (err != nil) != tt.wantErr {
@@ -196,67 +194,6 @@ func TestProceedEditor(t *testing.T) {
 			}
 			if got != tt.want {
 				t.Errorf("ProceedEditor() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestPopulateFileAddSelector(t *testing.T) {
-	type args struct {
-		gitDiffChangesString string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    []string
-		wantErr bool
-	}{
-		{
-			name: "TestEmptyString",
-			args: args{
-				gitDiffChangesString: "",
-			},
-			want:   []string{},
-			wantErr: true,
-		},
-		{
-			name: "TestValidString",
-			args: args{
-				gitDiffChangesString: "foo.txt\nbar.txt",
-			},
-			want: []string{"foo.txt", "bar.txt"},
-		},
-		{
-			name: "TestValidStringWithExtraSpace",
-			args: args{
-				gitDiffChangesString: "foo.txt\n bar.txt",
-			},
-			want: []string{"foo.txt", "bar.txt"},
-		},
-		{
-			name: "TestValidStringWithHeadingAndTrailingSpaces",
-			args: args{
-				gitDiffChangesString: "  foo.txt   \n  bar.txt  ",
-			},
-			want: []string{"foo.txt", "bar.txt"},
-		},
-		{
-			name: "TestValidStringWithExtraNewLineAndSpaces",
-			args: args{
-				gitDiffChangesString: "foo.txt \nbar.txt\n",
-			},
-			want: []string{"foo.txt", "bar.txt"},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := PopulateFileAddSelector(tt.args.gitDiffChangesString)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("PopulateFileAddSelector() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("PopulateFileAddSelector() = %v, want %v", got, tt.want)
 			}
 		})
 	}
