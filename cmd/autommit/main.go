@@ -51,7 +51,11 @@ func main() {
 	utils.ErrCheck(err)
 
 	// get pgp keyring
-	autommit.GetOpenPGPKeyring()
+	if (*pgpKeyPath != "") {
+		autommit.GetOpenPGPKeyring()
+	} else {
+		fmt.Println("No PGP key provided. Will not sign commits.")
+	}
 
 	// add files to the commit
 	autommit.GitAddDialogue()
