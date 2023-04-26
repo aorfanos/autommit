@@ -8,7 +8,7 @@ import (
 	"github.com/aorfanos/autommit/utils"
 )
 
-const version = "0.0.7"
+const version = "0.0.10"
 
 var (
 	openAiApiKey = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
