@@ -29,16 +29,26 @@ autommit --pgp-key-path /path/to/your/pgp/key
 Usage of autommit:
   -conventional-commits-type string
         Will add the provided type to the commit message (default "feat")
+  -git-config-path string
+        Will set the git config path (default "~/.gitconfig")
+  -git-mail string
+        Will set the git email
+  -git-user string
+        Will set the git user
+  -max-chars int
+        Will set the max characters for the commit message (default 80)
   -openai-api-key string
         OpenAI API key
   -path string
         Path to the git repository (default ".")
-  -pgp-sign
-        Will sign the commit with the default PGP key (default true)
+  -pgp-key-path string
+        Path to the PGP key
   -sign-commits-with-message string
         Will add the provided message to the long commit message (default "Created by autommit 🦄")
   -t string
-        Alias of --conventional-commits-type
+        Alias of --conventional-commits-type (default "feat")
+  -version
+        Will show the version of autommit
 ```
 
 ### Demo
