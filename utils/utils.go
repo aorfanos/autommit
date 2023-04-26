@@ -77,7 +77,10 @@ func (a *Autommit) PopulateGitUserInfo() (error) {
 	a.GitConfig.AuthorMail = config["user.email"]
 
 	if (a.GitConfig.Author == "" || a.GitConfig.AuthorMail == "") {
-		err = fmt.Errorf("No git user info found, will not proceed")
+		err = fmt.Errorf("No git user info found")
+		if (a.GitConfig.FilePath == "") {
+
+		}
 	}
 
 	return err
