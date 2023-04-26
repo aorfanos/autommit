@@ -30,14 +30,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Install Dive
+      run: |
+        brew install dive
     
     - name: Build image
       run: docker build -t autommit:test .
 
     - name: Test with Dive
-      uses: yuichielectric/dive-action@0.0.4
-      with:
-        image: "autommit:test"
-        config-file: ${{ github.workspace }}/.dive-ci.yaml
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-
+      run: dive --ci --ci-config .dive.ci.yaml autommit:test
