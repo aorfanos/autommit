@@ -40,4 +40,4 @@ jobs:
       run: docker build -t autommit:test .
 
     - name: Test with Dive
-      run: dive --ci --ci-config .dive.ci.yaml autommit:test
+      run: dive --ci --ci-config .dive-ci.yaml autommit:test
