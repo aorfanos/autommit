@@ -3,7 +3,7 @@ name: Go Test
 on: [push, pull_request]
 
 jobs:
-  test:
+  test-go:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,3 +25,19 @@ jobs:
       with:
         name: coverage
         path: coverage.out
+  test-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build image
+      run: docker build -t autommit:test .
+
+    - name: Test with Dive
+      uses: yuichielectric/dive-action@0.0.4
+      with:
+        image: "autommit:test"
+        config-file: ${{ github.workspace }}/.dive-ci.yaml
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+
