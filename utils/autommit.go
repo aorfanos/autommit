@@ -16,10 +16,11 @@ type Autommit struct {
 	PgpKeyPath string
 	CommitInfo Commit
 	Type string
+	MaxChars int
 	GitConfig GitConfig
 }
 
-func NewAutommit(version, openAiApiKey, commitType, path, pgpKeyPath, gitConfig string) (*Autommit, error) {
+func NewAutommit(version, openAiApiKey, commitType, path, pgpKeyPath, gitConfig string, maxChars int) (*Autommit, error) {
 	ctx := context.Background()
 	client := openai.NewClient(openAiApiKey)
 	repo, err := git.PlainOpen(path)
@@ -34,6 +35,7 @@ func NewAutommit(version, openAiApiKey, commitType, path, pgpKeyPath, gitConfig 
 		OpenAiClient: *client,
 		Type: commitType,
 		PgpKeyPath: pgpKeyPath,
+		MaxChars: maxChars,
 		GitConfig: GitConfig{
 			FilePath: gitConfig,
 			RepoPath: path,

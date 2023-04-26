@@ -20,6 +20,7 @@ var (
 	gitEmail = flag.String("git-mail", "", "Will set the git email")
 	gitConfigPath = flag.String("git-config-path", "~/.gitconfig", "Will set the git config path")
 	showVersion = flag.Bool("version", false, "Will show the version of autommit")
+	maxChars = flag.Int("max-chars", 80, "Will set the max characters for the commit message")
 	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
 
@@ -55,6 +56,7 @@ func main() {
 		*path,
 		*pgpKeyPath,
 		*gitConfigPath,
+		*maxChars,
 	)
 	utils.ErrCheck(err)
 
