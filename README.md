@@ -10,7 +10,7 @@ It uses the OpenAI API and your local `git` cli to generate appropriate commit m
 
 ## Requirements
 
-- OpenAI API key
+- OpenAI API key (either in cli with `--openai-api-key` or `OPENAI_API_KEY` environment variable)
 - `git` executable in your $PATH
 - If you want to sign/verify your commits, make sure you have a PGP key pair (public and private keys). If you don't have a PGP key pair, you can generate one using [GnuPG](https://gnupg.org/). Then provide the `--pgp-key-path` flag to autommit as follows:
 
