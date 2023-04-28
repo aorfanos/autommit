@@ -32,6 +32,9 @@ func NewAutommit(version, openAiApiKey, commitType, path, pgpKeyPath, gitConfig 
 			return nil, err
 		}
 		repo, err = git.PlainOpen(foundPath)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	workTree, err := repo.Worktree()

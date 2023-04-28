@@ -185,6 +185,9 @@ func (a *Autommit) GitCommit() error {
 				Committer: author,
 			},
 		)
+		if err != nil {
+			return err
+		}
 	} else {
 		// Create the commit with the PGP signature
 		commitHash, err = a.GitConfig.Worktree.Commit(
