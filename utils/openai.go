@@ -10,7 +10,7 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
-func (a *Autommit) NewOpenAiClient() (*openai.Client) {
+func (a *Autommit) NewOpenAiClient() *openai.Client {
 	return openai.NewClient(a.OpenAiApiKey)
 }
 

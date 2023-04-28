@@ -11,16 +11,16 @@ import (
 const version = "0.0.12"
 
 var (
-	openAiApiKey = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
-	path = flag.String("path", ".", "Path to the git repository")
-	pgpKeyPath = flag.String("pgp-key-path", "", "Path to the PGP key")
+	openAiApiKey       = flag.String("openai-api-key", os.Getenv("OPENAI_API_KEY"), "OpenAI API key")
+	path               = flag.String("path", ".", "Path to the git repository")
+	pgpKeyPath         = flag.String("pgp-key-path", "", "Path to the PGP key")
 	signCommitsMessage = flag.String("sign-commits-with-message", "Created by autommit 🦄", "Will add the provided message to the long commit message")
-	convCommitsType = flag.String("conventional-commits-type", "feat", "Will add the provided type to the commit message")
-	gitUser = flag.String("git-user", "", "Will set the git user")
-	gitEmail = flag.String("git-mail", "", "Will set the git email")
-	gitConfigPath = flag.String("git-config-path", "~/.gitconfig", "Will set the git config path")
-	showVersion = flag.Bool("version", false, "Will show the version of autommit")
-	maxChars = flag.Int("max-chars", 80, "Will set the max characters for the commit message")
+	convCommitsType    = flag.String("conventional-commits-type", "feat", "Will add the provided type to the commit message")
+	gitUser            = flag.String("git-user", "", "Will set the git user")
+	gitEmail           = flag.String("git-mail", "", "Will set the git email")
+	gitConfigPath      = flag.String("git-config-path", "~/.gitconfig", "Will set the git config path")
+	showVersion        = flag.Bool("version", false, "Will show the version of autommit")
+	maxChars           = flag.Int("max-chars", 80, "Will set the max characters for the commit message")
 	// nonInteractive = flag.Bool("non-interactive", false, "Will automatically add, commit and push the commit to the remote repository")
 )
 
@@ -30,14 +30,14 @@ func init() {
 
 func main() {
 	flag.Parse()
-	if (*showVersion) {
+	if *showVersion {
 		utils.ShowVersion(version)
 		os.Exit(0)
 	}
 	// redundant loop since we use the envvar as default for openAiApiKey
 	// @TODO: reassess
-	if (*openAiApiKey == "") {
-		if (os.Getenv("OPENAI_API_KEY") == "") {
+	if *openAiApiKey == "" {
+		if os.Getenv("OPENAI_API_KEY") == "" {
 			fmt.Println("Please provide an OpenAI API token")
 			os.Exit(1)
 			return
@@ -61,13 +61,13 @@ func main() {
 	utils.ErrCheck(err)
 
 	// get git user info from .gitconfig
-	if (*gitUser == "" || *gitEmail == "") {
+	if *gitUser == "" || *gitEmail == "" {
 		err = autommit.PopulateGitUserInfo()
 		utils.ErrCheck(err)
 	}
 
 	// get pgp keyring
-	if (*pgpKeyPath != "") {
+	if *pgpKeyPath != "" {
 		err = autommit.GetOpenPGPKeyring()
 		utils.ErrCheck(err)
 	} else {
@@ -77,7 +77,7 @@ func main() {
 	// add files to the commit
 	autommit.GitAddDialogue()
 
-	COMPLETIONLOOP:
+COMPLETIONLOOP:
 	answer, err := autommit.CreateCompletionRequest(autommit.GeneratePrompt(utils.GitDiff(true, nil), *signCommitsMessage))
 	if err != nil {
 		// if there's an issue reaching the OpenAI API, we unstage the files
@@ -90,7 +90,7 @@ func main() {
 	err = autommit.ParseStringAsJson(answer)
 	utils.ErrCheck(err)
 
-	if (autommit.GitCommitDialogue()) {
+	if autommit.GitCommitDialogue() {
 		fmt.Println("Commit successful. Proceeding to push routine.")
 		autommit.GitPush()
 	} else {

@@ -14,30 +14,29 @@ import (
 )
 
 var (
-	gitCommitSelectorQTitle = "Proceed with the commit?"
+	gitCommitSelectorQTitle   = "Proceed with the commit?"
 	gitCommitSelectorQChoices = []string{"✅ Yes", "❌ No", "💸 Regenerate", "🔍 Edit"}
-	gitPushSelectorQTitle = "Push to remote?"
-	gitPushSelectorQChoices = []string{"✅ Yes", "❌ No"}
-	gitAddSelectorQTitle = "Select files to add to the commit"
+	gitPushSelectorQTitle     = "Push to remote?"
+	gitPushSelectorQChoices   = []string{"✅ Yes", "❌ No"}
+	gitAddSelectorQTitle      = "Select files to add to the commit"
 
-    cmd *exec.Cmd
+	cmd *exec.Cmd
 )
 
 type GitConfig struct {
-	Author string
+	Author     string
 	AuthorMail string
-	RepoPath string
-	FilePath string
-	Repo *git.Repository
-	Worktree *git.Worktree
-	HeadRef *plumbing.Reference
+	RepoPath   string
+	FilePath   string
+	Repo       *git.Repository
+	Worktree   *git.Worktree
+	HeadRef    *plumbing.Reference
 	PGPKeyRing openpgp.EntityList
 }
 
-
 type Commit struct {
-	Message string `json:"commit_message"`
-	MessageLong string `json:"commit_message_long"`
+	Message       string   `json:"commit_message"`
+	MessageLong   string   `json:"commit_message_long"`
 	FilesAffected []string `json:"files_affected"`
 }
 
@@ -56,8 +55,8 @@ func (a *Autommit) GitAddDialogue() {
 
 	stagedFilesExist, _ := a.CheckForStagedFiles()
 
-	if (len(fileList) == 0) {
-		if (!stagedFilesExist) {
+	if len(fileList) == 0 {
+		if !stagedFilesExist {
 			fmt.Println("No files to stage, or already staged - exiting")
 			os.Exit(0)
 		} else {
@@ -74,17 +73,17 @@ func (a *Autommit) GitAddDialogue() {
 	for index < 0 {
 		prompt := promptui.SelectWithAdd{
 			AddLabel: "Custom path (e.g. '.' or 'src/')",
-			Label: gitAddSelectorQTitle,
-			Items: fileList,
+			Label:    gitAddSelectorQTitle,
+			Items:    fileList,
 		}
 
 		index, result, err = prompt.Run()
 
-		if (result == "⏩ Proceed to commit") {
+		if result == "⏩ Proceed to commit" {
 			return
 		}
 
-		if (index == -1) {
+		if index == -1 {
 			fileList = append(fileList, result)
 		}
 	}
@@ -99,9 +98,9 @@ func (a *Autommit) GitAddDialogue() {
 
 	addAnother, err := ProceedSelector("Add another file?", []string{"✅ Yes", "⏩ Take me to commit", "❌ Exit"})
 	ErrCheck(err)
-	if (addAnother == "✅ Yes") {
+	if addAnother == "✅ Yes" {
 		a.GitAddDialogue()
-	} else if (addAnother == "❌ Exit") {
+	} else if addAnother == "❌ Exit" {
 		a.UnstageFiles()
 		os.Exit(0)
 	} else {
@@ -111,8 +110,8 @@ func (a *Autommit) GitAddDialogue() {
 
 // if not staged, it will accept a list of strings to be passed to git
 // as arguments
-func GitDiff(staged bool, args []string) (string) {
-	if (staged) {
+func GitDiff(staged bool, args []string) string {
+	if staged {
 		cmd = exec.Command("git", "diff", "--staged", "HEAD")
 	} else {
 		cmd = exec.Command("git", args...)
@@ -129,14 +128,14 @@ func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 	result, err := ProceedSelector(gitCommitSelectorQTitle, gitCommitSelectorQChoices)
 	ErrCheck(err)
 
-	IF_EVAL_START:
-	if (result == gitCommitSelectorQChoices[1]) { // no
+IF_EVAL_START:
+	if result == gitCommitSelectorQChoices[1] { // no
 		// unstage all files and exit
 		a.UnstageFiles()
 		os.Exit(0)
-	} else if (result == gitCommitSelectorQChoices[2]) { // regenerate
+	} else if result == gitCommitSelectorQChoices[2] { // regenerate
 		return false
-	} else if (result == gitCommitSelectorQChoices[3]) { // edit
+	} else if result == gitCommitSelectorQChoices[3] { // edit
 		a.CommitInfo.Message, err = ProceedEditor("Change commit message", a.CommitInfo.Message)
 		ErrCheck(err)
 		a.CommitInfo.MessageLong, err = ProceedEditor("Change commit message long", a.CommitInfo.MessageLong)
@@ -146,7 +145,7 @@ func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 		// since we assume intent to commit after editing
 		result = gitCommitSelectorQChoices[0]
 		goto IF_EVAL_START
-	} else if (result == gitCommitSelectorQChoices[0]) { // yes
+	} else if result == gitCommitSelectorQChoices[0] { // yes
 		err = a.GitCommit()
 		ErrCheck(err)
 		return true
@@ -154,7 +153,7 @@ func (a *Autommit) GitCommitDialogue() (regenerate bool) {
 	return
 }
 
-func (a *Autommit) GitCommit() (error) {
+func (a *Autommit) GitCommit() error {
 	// Get the current HEAD reference
 	headRef, err := a.GitConfig.Repo.Head()
 	if err != nil {
@@ -177,12 +176,12 @@ func (a *Autommit) GitCommit() (error) {
 
 	var commitHash plumbing.Hash
 
-	if (a.PgpKeyPath == "") {
+	if a.PgpKeyPath == "" {
 		// Create the unsigned commit
 		commitHash, err = a.GitConfig.Worktree.Commit(
 			commitMessage,
 			&git.CommitOptions{
-				Author: author,
+				Author:    author,
 				Committer: author,
 			},
 		)
@@ -210,11 +209,11 @@ func (a *Autommit) GitPush() error {
 	result, err := ProceedSelector(gitPushSelectorQTitle, gitPushSelectorQChoices)
 	ErrCheck(err)
 
-	if (result == gitPushSelectorQChoices[1]) { // no
+	if result == gitPushSelectorQChoices[1] { // no
 		fmt.Println("Push aborted")
 		a.UnstageFiles()
 		os.Exit(0)
-	} else if (result == gitPushSelectorQChoices[0]) { // yes
+	} else if result == gitPushSelectorQChoices[0] { // yes
 		err = a.GitConfig.Repo.Push(&git.PushOptions{})
 		return err
 	}
@@ -232,8 +231,8 @@ func (a *Autommit) PopulateFileList() ([]string, error) {
 	// populate file list
 	for fileName, fileStatus := range files {
 		// skip files that are staged
-		if (fileStatus.Staging == git.Modified ||
-			fileStatus.Staging == git.Added) {
+		if fileStatus.Staging == git.Modified ||
+			fileStatus.Staging == git.Added {
 			continue
 		} else {
 			fileList = append(fileList, fileName)
@@ -250,8 +249,8 @@ func (a *Autommit) CheckForStagedFiles() (exist bool, fileNames []string) {
 	ErrCheck(err)
 
 	for fileName, fileStatus := range files {
-		if (fileStatus.Staging == git.Modified ||
-			fileStatus.Staging == git.Added) {
+		if fileStatus.Staging == git.Modified ||
+			fileStatus.Staging == git.Added {
 			fileNames = append(fileNames, fileName)
 			return true, fileNames
 		}
@@ -260,7 +259,7 @@ func (a *Autommit) CheckForStagedFiles() (exist bool, fileNames []string) {
 }
 
 // UnstageFiles unstages all files
-func (a *Autommit) UnstageFiles() (error) {
+func (a *Autommit) UnstageFiles() error {
 	err := a.GitConfig.Worktree.Reset(&git.ResetOptions{
 		Mode: git.MixedReset,
 	})
