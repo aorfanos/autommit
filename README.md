@@ -54,7 +54,11 @@ Usage of autommit:
 
 ### Demo
 
-- Asciinema [rec](https://goo.com)
+- Asciinema [rec](https://asciinema.org/a/pHw8B0yFbJCnIMfYpTDWE81jw) 
+
+The commit that was created: https://github.com/aorfanos/autommit/commit/6ffab96bf686621fc8dbd2c3db25c15c858ef753
+
+Also don't try the api key, it won't work :D
 
 ## Installation
 
