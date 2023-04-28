@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/user"
 	"path/filepath"
 
@@ -85,4 +86,54 @@ func (a *Autommit) PopulateGitUserInfo() (error) {
 
 func ShowVersion(version string) {
 	fmt.Printf("Autommit version %s 🦄\n", version)
+}
+
+func FindDotGit(repoPath string) (path string, err error) {
+	var dotGit string = fmt.Sprintf("%s/.git", repoPath)
+    // Check current directory for file
+    _, err = os.Stat(dotGit);
+    if err == nil {
+        // File found in current directory
+        return repoPath, nil
+    }
+
+    // Traverse parent directories
+    for i := 0; i < getDirectoryLevelsToRoot(); i++ {
+        err = os.Chdir("..")
+        if err != nil {
+            // Unable to change directory
+            return "", err
+        }
+
+        // Check new directory for file
+        _, err = os.Stat(dotGit)
+        if err == nil {
+            // File found in parent directory
+			pwd, err := os.Getwd()
+			if err != nil {
+				return "", err
+			}
+			fmt.Printf("WD is: %s\n", pwd)
+            return fmt.Sprintf("%s", pwd), nil
+        }
+    }
+
+    // File not found in any directory
+    return "", fmt.Errorf("Dir .git not found in your current dir, nor any parent dir")
+}
+
+func getDirectoryLevelsToRoot() int {
+    var levels int
+    dir, err := os.Getwd()
+    if err != nil {
+        // Error getting current directory
+        return -1
+    }
+
+    for dir != "/" {
+        dir = filepath.Dir(dir)
+        levels++
+    }
+
+    return levels
 }
