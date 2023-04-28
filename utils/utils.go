@@ -14,24 +14,24 @@ import (
 )
 
 func ErrCheck(err error) {
-	if (err != nil) {
+	if err != nil {
 		log.Fatal(fmt.Sprintf("error: %s\n", err.Error()))
 	}
 }
 
 func ErrReturn(err error) error {
-	if (err != nil) {
+	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (a *Autommit) ParseStringAsJson(strSrc string) (error) {
+func (a *Autommit) ParseStringAsJson(strSrc string) error {
 	var c Commit
 	err := json.Unmarshal([]byte(strSrc), &c)
 	if err != nil {
 		return err
-	} else if (c.Message == "" || c.MessageLong == "") {
+	} else if c.Message == "" || c.MessageLong == "" {
 		return fmt.Errorf("Invalid JSON")
 	}
 	a.CommitInfo.Message = c.Message
@@ -50,7 +50,7 @@ func ProceedSelector(title string, choices []string) (string, error) {
 
 func ProceedEditor(title, target string) (string, error) {
 	prompt := promptui.Prompt{
-		Label: title,
+		Label:   title,
 		Default: target,
 	}
 	result, err := prompt.Run()
@@ -60,11 +60,11 @@ func ProceedEditor(title, target string) (string, error) {
 
 // func PopulateGitUserInfo() will parse a .gitconfig file
 // and populate the Autommit struct with the user's name and email
-func (a *Autommit) PopulateGitUserInfo() (error) {
+func (a *Autommit) PopulateGitUserInfo() error {
 	user, err := user.Current()
 	ErrReturn(err)
 
-	if (a.GitConfig.FilePath == "~/.gitconfig") {
+	if a.GitConfig.FilePath == "~/.gitconfig" {
 		a.GitConfig.FilePath = filepath.Join(user.HomeDir, ".gitconfig")
 	}
 
@@ -77,7 +77,7 @@ func (a *Autommit) PopulateGitUserInfo() (error) {
 	a.GitConfig.Author = config["user.name"]
 	a.GitConfig.AuthorMail = config["user.email"]
 
-	if (a.GitConfig.Author == "" || a.GitConfig.AuthorMail == "") {
+	if a.GitConfig.Author == "" || a.GitConfig.AuthorMail == "" {
 		err = fmt.Errorf("No git user info found")
 	}
 
@@ -90,49 +90,49 @@ func ShowVersion(version string) {
 
 func FindDotGit(repoPath string) (path string, err error) {
 	var dotGit string = fmt.Sprintf("%s/.git", repoPath)
-    // Check current directory for file
-    _, err = os.Stat(dotGit);
-    if err == nil {
-        // File found in current directory
-        return repoPath, nil
-    }
+	// Check current directory for file
+	_, err = os.Stat(dotGit)
+	if err == nil {
+		// File found in current directory
+		return repoPath, nil
+	}
 
-    // Traverse parent directories
-    for i := 0; i < getDirectoryLevelsToRoot(); i++ {
-        err = os.Chdir("..")
-        if err != nil {
-            // Unable to change directory
-            return "", err
-        }
+	// Traverse parent directories
+	for i := 0; i < getDirectoryLevelsToRoot(); i++ {
+		err = os.Chdir("..")
+		if err != nil {
+			// Unable to change directory
+			return "", err
+		}
 
-        // Check new directory for file
-        _, err = os.Stat(dotGit)
-        if err == nil {
-            // File found in parent directory
+		// Check new directory for file
+		_, err = os.Stat(dotGit)
+		if err == nil {
+			// File found in parent directory
 			pwd, err := os.Getwd()
 			if err != nil {
 				return "", err
 			}
-            return fmt.Sprintf("%s", pwd), nil
-        }
-    }
+			return fmt.Sprintf("%s", pwd), nil
+		}
+	}
 
-    // File not found in any directory
-    return "", fmt.Errorf("Dir .git not found in your current dir, nor any parent dir - exiting")
+	// File not found in any directory
+	return "", fmt.Errorf("Dir .git not found in your current dir, nor any parent dir - exiting")
 }
 
 func getDirectoryLevelsToRoot() int {
-    var levels int
-    dir, err := os.Getwd()
-    if err != nil {
-        // Error getting current directory
-        return -1
-    }
+	var levels int
+	dir, err := os.Getwd()
+	if err != nil {
+		// Error getting current directory
+		return -1
+	}
 
-    for dir != "/" {
-        dir = filepath.Dir(dir)
-        levels++
-    }
+	for dir != "/" {
+		dir = filepath.Dir(dir)
+		levels++
+	}
 
-    return levels
+	return levels
 }

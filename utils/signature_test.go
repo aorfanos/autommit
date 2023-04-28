@@ -24,7 +24,7 @@ func TestAutommit_GetOpenPGPKeyring(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:   "TestInvalidKeyPath",
+			name: "TestInvalidKeyPath",
 			fields: fields{
 				PgpKeyPath: "nonexistent",
 			},
