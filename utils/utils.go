@@ -113,13 +113,12 @@ func FindDotGit(repoPath string) (path string, err error) {
 			if err != nil {
 				return "", err
 			}
-			fmt.Printf("WD is: %s\n", pwd)
             return fmt.Sprintf("%s", pwd), nil
         }
     }
 
     // File not found in any directory
-    return "", fmt.Errorf("Dir .git not found in your current dir, nor any parent dir")
+    return "", fmt.Errorf("Dir .git not found in your current dir, nor any parent dir - exiting")
 }
 
 func getDirectoryLevelsToRoot() int {
