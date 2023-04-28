@@ -168,3 +168,55 @@ func TestShowVersion(t *testing.T) {
 		})
 	}
 }
+
+func TestFindDotGit(t *testing.T) {
+	type args struct {
+		repoPath string
+	}
+	tests := []struct {
+		name     string
+		args     args
+		wantPath string
+		wantErr  bool
+	}{
+		{
+			name: "TestNonExistingRepo",
+			args: args{
+				repoPath: "/home/testdir",
+			},
+			wantPath: "",
+			wantErr:  true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotPath, err := FindDotGit(tt.args.repoPath)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FindDotGit() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if gotPath != tt.wantPath {
+				t.Errorf("FindDotGit() = %v, want %v", gotPath, tt.wantPath)
+			}
+		})
+	}
+}
+
+func Test_getDirectoryLevelsToRoot(t *testing.T) {
+	tests := []struct {
+		name string
+		want int
+	}{
+		{
+			name: "TestUtilsGHA", // adjusted to GitHub Actions' directory structure
+			want: 3,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getDirectoryLevelsToRoot(); got != tt.want {
+				t.Errorf("getDirectoryLevelsToRoot() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
