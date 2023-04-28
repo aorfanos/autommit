@@ -22,9 +22,9 @@ type Autommit struct {
 
 func NewAutommit(version, openAiApiKey, commitType, path, pgpKeyPath, gitConfig string, maxChars int) (*Autommit, error) {
 	ctx := context.Background()
-	
+
 	client := openai.NewClient(openAiApiKey)
-	
+
 	repo, err := git.PlainOpen(path)
 	if err != nil {
 		foundPath, err := FindDotGit(path)
@@ -33,13 +33,13 @@ func NewAutommit(version, openAiApiKey, commitType, path, pgpKeyPath, gitConfig 
 		}
 		repo, err = git.PlainOpen(foundPath)
 	}
-	
+
 	workTree, err := repo.Worktree()
 	ErrCheck(err)
-	
+
 	headRef, err := repo.Head()
 	ErrCheck(err)
-	
+
 	return &Autommit{
 		OpenAiApiKey: openAiApiKey,
 		Context: ctx,
