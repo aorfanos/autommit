@@ -1,6 +1,6 @@
 FROM golang:1.20-alpine AS build-env
 ENV CGO_ENABLED=0
-LABEL name="Autommit" version="0.0.10"
+LABEL name="Autommit" version="0.0.12"
 COPY . /build
 WORKDIR /build
 RUN go build -a -installsuffix cgo -ldflags "-w -s" -o autommit cmd/autommit/main.go
