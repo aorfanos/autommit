@@ -213,7 +213,7 @@ func (a *Autommit) GitPush() error {
 	if (result == gitPushSelectorQChoices[1]) { // no
 		fmt.Println("Push aborted")
 		a.UnstageFiles()
-		return nil
+		os.Exit(0)
 	} else if (result == gitPushSelectorQChoices[0]) { // yes
 		err = a.GitConfig.Repo.Push(&git.PushOptions{})
 		return err
