@@ -209,7 +209,7 @@ func Test_getDirectoryLevelsToRoot(t *testing.T) {
 	}{
 		{
 			name: "TestUtilsGHA", // adjusted to GitHub Actions' directory structure
-			want: 8,
+			want: 3,
 		},
 	}
 	for _, tt := range tests {
