@@ -7,7 +7,7 @@ require (
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/manifoldco/promptui v0.9.0
 	github.com/muja/goconfig v0.0.0-20180417074348-0a635507dddc
-	github.com/sashabaranov/go-openai v1.9.0
+	github.com/sashabaranov/go-openai v1.9.1
 )
 
 require (
