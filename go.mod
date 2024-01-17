@@ -3,7 +3,7 @@ module github.com/aorfanos/autommit
 go 1.19
 
 require (
-	github.com/ProtonMail/go-crypto v0.0.0-20230426101702-58e86b294756
+	github.com/ProtonMail/go-crypto v1.0.0
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/manifoldco/promptui v0.9.0
 	github.com/muja/goconfig v0.0.0-20180417074348-0a635507dddc
@@ -14,7 +14,7 @@ require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
-	github.com/cloudflare/circl v1.1.0 // indirect
+	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/go-git/go-billy/v5 v5.4.1 // indirect
