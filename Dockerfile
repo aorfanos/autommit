@@ -1,4 +1,4 @@
-FROM golang:1.20-alpine AS build-env
+FROM golang:1.23-alpine AS build-env
 ENV CGO_ENABLED=0
 LABEL name="Autommit" version="0.0.12"
 COPY . /build
